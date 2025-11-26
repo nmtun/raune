@@ -11,12 +11,14 @@ import { useNavigate } from 'react-router-dom';
 import { Truck, Star, Leaf, ChevronLeft, ChevronRight, AlertCircle, RefreshCw } from 'lucide-react';
 import restaurantsData from '@/data/restaurants.json';
 import { useRef } from 'react';
+import { useLanguage } from '@/hooks/useLanguage';
 
 const Index = () => {
   const navigate = useNavigate();
   const location = useGeolocation();
   const recommendations = useRecommendations(location.lat, location.lng);
   const restaurantScrollRef = useRef<HTMLDivElement>(null);
+  const { t } = useLanguage();
 
   const handleRefreshLocation = () => {
     location.refreshLocation();
@@ -35,8 +37,8 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header
-        location={location.isFallback ? "Hai Bà Trưng, Hanoi (mặc định)" : "Vị trí của bạn"}
-        userName="Khách hàng"
+        location={location.isFallback ? t('location.defaultLocation') : t('location.yourLocation')}
+        userName={t('header.customer')}
         onRefreshLocation={handleRefreshLocation}
         isLoadingLocation={location.loading}
         isFallbackLocation={location.isFallback}
@@ -51,8 +53,8 @@ const Index = () => {
               <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
               <div className="flex-1">
                 <div className="text-sm text-yellow-800">
-                  <p className="font-medium">Bật định vị để nhận gợi ý tốt hơn!</p>
-                  <p className="text-xs mt-1">Chúng tôi đang hiển thị kết quả cho Hà Nội theo mặc định.</p>
+                  <p className="font-medium">{t('location.enableLocationTitle')}</p>
+                  <p className="text-xs mt-1">{t('location.enableLocationDesc')}</p>
                 </div>
                 <Button
                   variant="outline"
@@ -62,7 +64,7 @@ const Index = () => {
                   disabled={location.loading}
                 >
                   <RefreshCw className={`w-3 h-3 mr-1 ${location.loading ? 'animate-spin' : ''}`} />
-                  Thử lại
+                  {t('location.tryAgain')}
                 </Button>
               </div>
             </div>
@@ -70,10 +72,10 @@ const Index = () => {
 
           <div className="text-center max-w-3xl mx-auto">
             <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Raune Launch: Đặt món nhanh & tiện lợi!
+              {t('hero.title')}
             </h1>
             <p className="text-lg text-muted-foreground mb-8">
-              Khám phá những món ăn ngon từ các nhà hàng tốt nhất gần bạn
+              {t('hero.subtitle')}
             </p>
 
             {/* Action Buttons */}
@@ -83,7 +85,7 @@ const Index = () => {
                 onClick={() => navigate('/search')}
                 className="text-lg"
               >
-                Tìm nhà hàng
+                {t('hero.findRestaurants')}
               </Button>
               <Button
                 size="lg"
@@ -94,7 +96,7 @@ const Index = () => {
                   });
                 }}
               >
-                Xem gần đây
+                {t('hero.viewNearby')}
               </Button>
             </div>
 
@@ -104,22 +106,22 @@ const Index = () => {
                 <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
                   <Truck className="w-6 h-6 text-primary-foreground" />
                 </div>
-                <h3 className="font-semibold text-foreground">Giao hàng nhanh</h3>
-                <p className="text-sm text-muted-foreground">Giao hàng tận nơi nhanh chóng</p>
+                <h3 className="font-semibold text-foreground">{t('hero.fastDelivery')}</h3>
+                <p className="text-sm text-muted-foreground">{t('hero.fastDeliveryDesc')}</p>
               </div>
               <div className="flex flex-col items-center space-y-2">
                 <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
                   <Star className="w-6 h-6 text-primary-foreground" />
                 </div>
-                <h3 className="font-semibold text-foreground">Chất lượng cao</h3>
-                <p className="text-sm text-muted-foreground">Nhà hàng được đánh giá cao</p>
+                <h3 className="font-semibold text-foreground">{t('hero.highQuality')}</h3>
+                <p className="text-sm text-muted-foreground">{t('hero.highQualityDesc')}</p>
               </div>
               <div className="flex flex-col items-center space-y-2">
                 <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
                   <Leaf className="w-6 h-6 text-primary-foreground" />
                 </div>
-                <h3 className="font-semibold text-foreground">Dinh dưỡng</h3>
-                <p className="text-sm text-muted-foreground">Món ăn tươi ngon & lành mạnh</p>
+                <h3 className="font-semibold text-foreground">{t('hero.nutrition')}</h3>
+                <p className="text-sm text-muted-foreground">{t('hero.nutritionDesc')}</p>
               </div>
             </div>
           </div>
@@ -130,12 +132,12 @@ const Index = () => {
       <section id="recommendations-dishes" className="py-12 bg-background">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-bold text-foreground">Món ăn được đề xuất</h2>
+            <h2 className="text-3xl font-bold text-foreground">{t('sections.recommendedDishes')}</h2>
             <Button
               variant="ghost"
               onClick={() => navigate('/search?sort=rating')}
             >
-              Xem thêm
+              {t('sections.seeMore')}
             </Button>
           </div>
 
@@ -168,12 +170,12 @@ const Index = () => {
       <section id="recommendations-restaurants" className="py-12 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-bold text-foreground">Nhà hàng hàng đầu gần bạn</h2>
+            <h2 className="text-3xl font-bold text-foreground">{t('sections.topRestaurants')}</h2>
             <Button
               variant="ghost"
               onClick={() => navigate('/search?sort=closest')}
             >
-              Xem tất cả
+              {t('sections.seeAll')}
             </Button>
           </div>
 

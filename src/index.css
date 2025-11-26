@@ -91,4 +91,81 @@ All colors MUST be HSL.
   .leaflet-popup-content {
     margin: 0.75rem;
   }
+
+  /* Language Switcher Animations */
+  .language-switcher-trigger {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .language-switcher-trigger::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
+    transition: left 0.5s;
+  }
+
+  .language-switcher-trigger:hover::before {
+    left: 100%;
+  }
+
+  /* Dropdown Menu Animation */
+  @keyframes slideDownAndFade {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideUpAndFade {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+  }
+
+  .language-dropdown {
+    animation: slideDownAndFade 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Flag emoji enhancement */
+  .flag-emoji {
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+    transition: transform 0.2s ease;
+  }
+
+  .flag-emoji:hover {
+    transform: scale(1.1);
+  }
+
+  /* Pulse animation for selected language */
+  @keyframes pulse-subtle {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+
+  .selected-language {
+    animation: pulse-subtle 2s ease-in-out infinite;
+  }
 }

@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { MapPin, Navigation } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useLanguage } from '@/hooks/useLanguage';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -82,13 +83,15 @@ export function LocationMap({
   onRefreshLocation,
   isLoadingLocation = false,
 }: LocationMapProps) {
+  const { t } = useLanguage();
+
   return (
     <Card className="w-full">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <MapPin className="w-5 h-5 text-primary" />
-            Bản đồ vị trí
+            {t('map.locationMap')}
           </CardTitle>
           {onRefreshLocation && (
             <Button
@@ -98,7 +101,7 @@ export function LocationMap({
               disabled={isLoadingLocation}
             >
               <Navigation className={`w-4 h-4 mr-2 ${isLoadingLocation ? 'animate-spin' : ''}`} />
-              Làm mới vị trí
+              {t('map.refreshLocation')}
             </Button>
           )}
         </div>
@@ -122,7 +125,7 @@ export function LocationMap({
               <Marker position={[userLat, userLng]} icon={userIcon}>
                 <Popup>
                   <div className="text-center">
-                    <strong className="text-blue-600">📍 Vị trí của bạn</strong>
+                    <strong className="text-blue-600">📍 {t('map.yourLocation')}</strong>
                     <p className="text-xs mt-1">
                       {userLat.toFixed(4)}, {userLng.toFixed(4)}
                     </p>
@@ -141,7 +144,7 @@ export function LocationMap({
                     <div className="min-w-[150px]">
                       <strong className="text-red-600">🍽️ {restaurant.name}</strong>
                       <p className="text-xs mt-1">
-                        📏 Cách bạn: <strong>{restaurant.distance.toFixed(1)} km</strong>
+                        📏 {t('map.distanceFromYou', { distance: restaurant.distance.toFixed(1) })}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         #{index + 1} trong danh sách
@@ -159,7 +162,7 @@ export function LocationMap({
           {/* Restaurant List */}
           <div className="space-y-2">
             <h4 className="text-sm font-semibold">
-              Nhà hàng gần bạn ({restaurants.length}):
+              {t('map.nearbyRestaurants', { count: restaurants.length })}
             </h4>
             <div className="max-h-48 overflow-y-auto space-y-2">
               {restaurants.slice(0, 10).map((restaurant, index) => (
@@ -180,7 +183,7 @@ export function LocationMap({
               ))}
               {restaurants.length > 10 && (
                 <p className="text-xs text-muted-foreground text-center py-2">
-                  ... và {restaurants.length - 10} nhà hàng khác
+                  {t('map.andMore', { count: restaurants.length - 10 })}
                 </p>
               )}
             </div>
@@ -190,22 +193,21 @@ export function LocationMap({
           <div className="flex items-center gap-4 text-xs text-muted-foreground bg-muted/30 p-3 rounded-md">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-              <span>Vị trí của bạn</span>
+              <span>{t('map.yourLocation')}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-              <span>Nhà hàng</span>
+              <span>{t('map.restaurant')}</span>
             </div>
           </div>
 
           {/* Instructions */}
           <div className="text-xs text-muted-foreground bg-blue-50 dark:bg-blue-950 p-3 rounded-md">
-            <p className="font-medium mb-1">💡 Hướng dẫn:</p>
+            <p className="font-medium mb-1">💡 {t('map.instructions')}</p>
             <ul className="list-disc list-inside space-y-1">
-              <li>Click vào marker để xem thông tin chi tiết</li>
-              <li>Kéo thả để di chuyển bản đồ</li>
-              <li>Cuộn chuột để zoom in/out</li>
-              <li>Marker xanh là vị trí của bạn, marker đỏ là nhà hàng</li>
+              {(t('map.instructionsList', { returnObjects: true }) as string[]).map((instruction, index) => (
+                <li key={index}>{instruction}</li>
+              ))}
             </ul>
           </div>
         </div>

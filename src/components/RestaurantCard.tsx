@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Star, MapPin, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface Dish {
   id: number;
@@ -37,6 +38,7 @@ export function RestaurantCard({
   dishes = [],
 }: RestaurantCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { t } = useLanguage();
 
   return (
     <div className="bg-card rounded-xl border border-border hover:shadow-md transition-all duration-300 overflow-hidden">
@@ -52,12 +54,12 @@ export function RestaurantCard({
           <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
           <p className="line-clamp-1">{address}</p>
         </div>
-        <p className="text-xs text-accent font-medium mt-2">{distance} away</p>
+        <p className="text-xs text-accent font-medium mt-2">{distance} {t('common.away')}</p>
         
         <div className="flex items-center mt-2">
           <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
           <span className="text-sm ml-1 text-foreground">
-            {rating} <span className="text-muted-foreground">({reviews} reviews)</span>
+            {rating} <span className="text-muted-foreground">({reviews} {t('common.reviews')})</span>
           </span>
         </div>
         
@@ -82,13 +84,13 @@ export function RestaurantCard({
               className="w-full mt-4 flex items-center justify-center gap-2"
               variant="default"
             >
-              {isExpanded ? 'Hide Menu' : 'View Menu'}
+              {isExpanded ? t('common.hideMenu') : t('common.viewMenu')}
               {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             </Button>
             
             {isExpanded && (
               <div className="mt-4 space-y-3 border-t border-border pt-4">
-                <h4 className="font-semibold text-sm text-foreground">Featured Dishes</h4>
+                <h4 className="font-semibold text-sm text-foreground">{t('common.featuredDishes')}</h4>
                 {dishes.map((dish) => (
                   <div key={dish.id} className="flex gap-3 bg-secondary/20 rounded-lg p-2">
                     <img

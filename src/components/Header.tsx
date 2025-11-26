@@ -2,6 +2,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Search, MapPin, User, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
+import { useLanguage } from '@/hooks/useLanguage';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 interface HeaderProps {
   location?: string;
@@ -20,6 +22,7 @@ export function Header({
 }: HeaderProps) {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const { t } = useLanguage();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,18 +48,18 @@ export function Header({
           {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
             <Link to="/" className="text-foreground hover:text-primary transition-colors">
-              Home
+              {t('header.home')}
             </Link>
             <Link to="/search" className="text-foreground hover:text-primary transition-colors">
-              Search
+              {t('header.search')}
             </Link>
             <a href="#recommendations-dishes" className="text-foreground hover:text-primary transition-colors">
-              Recommendations
+              {t('header.recommendations')}
             </a>
           </nav>
 
           {/* Right section */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-3">
             {/* Location */}
             <div className="hidden lg:flex items-center space-x-2 text-sm">
               <MapPin className={`w-4 h-4 ${isFallbackLocation ? 'text-yellow-500' : 'text-accent'}`} />
@@ -68,7 +71,7 @@ export function Header({
                   className="h-6 w-6"
                   onClick={onRefreshLocation}
                   disabled={isLoadingLocation}
-                  title="Làm mới vị trí"
+                  title={t('header.refreshLocation')}
                 >
                   <RefreshCw className={`w-3 h-3 ${isLoadingLocation ? 'animate-spin' : ''}`} />
                 </Button>
@@ -79,10 +82,10 @@ export function Header({
             <form onSubmit={handleSearch} className="hidden sm:flex items-center">
               <input
                 type="text"
-                placeholder="Search dishes..."
+                placeholder={t('header.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="px-3 py-1.5 text-sm border border-border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background"
+                className="px-3 py-1.5 text-sm border border-border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background transition-all duration-200"
               />
               <Button
                 type="submit"
@@ -103,8 +106,13 @@ export function Header({
               <Search className="w-5 h-5" />
             </Button>
 
+            {/* Language Switcher */}
+            <div className="flex items-center">
+              <LanguageSwitcher />
+            </div>
+
             {/* User profile */}
-            <div className="flex items-center space-x-2 px-3 py-1.5 bg-muted rounded-lg">
+            <div className="flex items-center space-x-2 px-3 py-1.5 bg-muted/60 rounded-lg border border-border/30 hover:bg-muted transition-colors duration-200">
               <User className="w-4 h-4 text-primary" />
               <span className="text-sm font-medium hidden sm:inline">{userName}</span>
             </div>

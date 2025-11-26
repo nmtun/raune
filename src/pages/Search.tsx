@@ -14,11 +14,13 @@ import { flexibleMatch } from '@/utils/stringUtils';
 import restaurantsData from '@/data/restaurants.json';
 import menusData from '@/data/menus.json';
 import { ArrowLeft, SlidersHorizontal, Map } from 'lucide-react';
+import { useLanguage } from '@/hooks/useLanguage';
 
 const Search = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useGeolocation();
+  const { t } = useLanguage();
   
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'rating');
@@ -129,8 +131,8 @@ const Search = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header 
-        location={location.isFallback ? "Hai Bà Trưng, Hanoi (mặc định)" : "Vị trí của bạn"}
-        userName="Khách hàng"
+        location={location.isFallback ? t('location.defaultLocation') : t('location.yourLocation')}
+        userName={t('header.customer')}
         onRefreshLocation={handleRefreshLocation}
         isLoadingLocation={location.loading}
         isFallbackLocation={location.isFallback}
@@ -144,14 +146,14 @@ const Search = () => {
             onClick={() => navigate('/')}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Về trang chủ
+            {t('search.backHome')}
           </Button>
           <Button
             variant="outline"
             onClick={() => setShowMap(!showMap)}
           >
             <Map className="w-4 h-4 mr-2" />
-            {showMap ? 'Ẩn bản đồ' : 'Hiện bản đồ'}
+            {showMap ? t('search.hideMap') : t('search.showMap')}
           </Button>
         </div>
 
@@ -162,12 +164,12 @@ const Search = () => {
             <div className="flex gap-2">
               <Input
                 type="text"
-                placeholder="Tìm nhà hàng, món ăn... (VD: pho, ba dinh, banh mi)"
+                placeholder={t('search.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="flex-1"
               />
-              <Button type="submit">Tìm kiếm</Button>
+              <Button type="submit">{t('search.searchButton')}</Button>
               <Button
                 type="button"
                 variant="outline"
@@ -183,32 +185,32 @@ const Search = () => {
               {/* Sort and Distance */}
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1">
-                  <Label className="text-sm font-medium mb-2 block">Sắp xếp theo</Label>
+                  <Label className="text-sm font-medium mb-2 block">{t('search.sortBy')}</Label>
                   <Select value={sortBy} onValueChange={setSortBy}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="rating">Đánh giá cao nhất</SelectItem>
-                      <SelectItem value="distance">Gần nhất</SelectItem>
-                      <SelectItem value="reviews">Nhiều đánh giá nhất</SelectItem>
+                      <SelectItem value="rating">{t('sort.rating')}</SelectItem>
+                      <SelectItem value="distance">{t('sort.distance')}</SelectItem>
+                      <SelectItem value="reviews">{t('sort.reviews')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="flex-1">
                   <Label className="text-sm font-medium mb-2 block">
-                    Bán kính tìm kiếm: {maxDistance} km
+                    {t('search.searchRadius', { radius: maxDistance })}
                   </Label>
                   <Select value={maxDistance.toString()} onValueChange={(v) => setMaxDistance(Number(v))}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="3">Trong vòng 3 km</SelectItem>
-                      <SelectItem value="5">Trong vòng 5 km</SelectItem>
-                      <SelectItem value="10">Trong vòng 10 km</SelectItem>
-                      <SelectItem value="20">Trong vòng 20 km</SelectItem>
-                      <SelectItem value="50">Trong vòng 50 km</SelectItem>
+                      <SelectItem value="3">{t('distance.within3km')}</SelectItem>
+                      <SelectItem value="5">{t('distance.within5km')}</SelectItem>
+                      <SelectItem value="10">{t('distance.within10km')}</SelectItem>
+                      <SelectItem value="20">{t('distance.within20km')}</SelectItem>
+                      <SelectItem value="50">{t('distance.within50km')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -216,7 +218,7 @@ const Search = () => {
 
               {/* Categories */}
               <div>
-                <Label className="text-sm font-medium mb-2 block">Danh mục</Label>
+                <Label className="text-sm font-medium mb-2 block">{t('search.category')}</Label>
                 <div className="flex flex-wrap gap-2">
                   {categories.map((category) => {
                     const isSelected =
@@ -224,13 +226,16 @@ const Search = () => {
                         ? selectedCategories.length === 0
                         : selectedCategories.includes(category);
                     
-                    const categoryNames: Record<string, string> = {
-                      'All': 'Tất cả',
-                      'Vietnamese': 'Việt Nam',
-                      'Asian': 'Châu Á',
-                      'Western': 'Phương Tây',
-                      'Cafe': 'Cà phê',
-                      'Fast Food': 'Đồ ăn nhanh'
+                    const getCategoryName = (cat: string) => {
+                      switch(cat) {
+                        case 'All': return t('categories.all');
+                        case 'Vietnamese': return t('categories.vietnamese');
+                        case 'Asian': return t('categories.asian');
+                        case 'Western': return t('categories.western');
+                        case 'Cafe': return t('categories.cafe');
+                        case 'Fast Food': return t('categories.fastFood');
+                        default: return cat;
+                      }
                     };
                     
                     return (
@@ -244,7 +249,7 @@ const Search = () => {
                             : 'bg-background text-foreground border-border hover:border-primary'
                         }`}
                       >
-                        {categoryNames[category] || category}
+                        {getCategoryName(category)}
                       </button>
                     );
                   })}
@@ -277,22 +282,22 @@ const Search = () => {
         <div className="mb-4">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-foreground">
-              Nhà hàng ({filteredRestaurants.length})
+              {t('search.restaurants', { count: filteredRestaurants.length })}
             </h2>
             {searchQuery && (
               <p className="text-sm text-muted-foreground">
-                Tìm kiếm: "<span className="font-medium">{searchQuery}</span>"
+                {t('search.searchFor', { query: searchQuery })}
               </p>
             )}
           </div>
           {location.isFallback && (
             <p className="text-sm text-yellow-600 mt-1">
-              Đang sử dụng vị trí mặc định. Bật định vị để có kết quả chính xác hơn.
+              {t('location.fallbackNote')}
             </p>
           )}
           {searchQuery && filteredRestaurants.length > 0 && (
             <p className="text-xs text-green-600 mt-1">
-              💡 Mẹo: Tìm kiếm không phân biệt dấu - "pho" cũng tìm được "Phở", "ba dinh" tìm được "Ba Đình"
+              {t('search.searchTip')}
             </p>
           )}
         </div>
@@ -300,7 +305,7 @@ const Search = () => {
         {filteredRestaurants.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground">
-              Không tìm thấy nhà hàng nào.{' '}
+              {t('search.noResults')}{' '}
               <button
                 onClick={() => {
                   setSearchQuery('');
@@ -309,7 +314,7 @@ const Search = () => {
                 }}
                 className="text-primary hover:underline"
               >
-                Thử xóa bộ lọc
+                {t('search.clearFilters')}
               </button>
             </p>
           </div>
