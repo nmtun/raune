@@ -78,9 +78,18 @@ All colors MUST be HSL.
     display: none;
   }
 
-  /* Leaflet map styles */
+  /* Leaflet map styles - ensure map stays below header (z-50) */
   .leaflet-container {
     font-family: 'Inter', sans-serif;
+    z-index: 1 !important;
+  }
+
+  .leaflet-control-container {
+    z-index: 40 !important;
+  }
+
+  .leaflet-popup {
+    z-index: 45 !important;
   }
 
   .leaflet-popup-content-wrapper {
@@ -90,5 +99,10 @@ All colors MUST be HSL.
 
   .leaflet-popup-content {
     margin: 0.75rem;
+  }
+
+  .leaflet-top,
+  .leaflet-bottom {
+    z-index: 40 !important;
   }
 }

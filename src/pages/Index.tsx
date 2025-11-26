@@ -202,7 +202,7 @@ const Index = () => {
             ) : (
               <div
                 ref={restaurantScrollRef}
-                className="flex gap-8 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide px-4"
+                className="flex gap-8 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide px-4 justify-center"
               >
                 {recommendations.restaurants.map(({ restaurant }) => (
                   <RestaurantLogo

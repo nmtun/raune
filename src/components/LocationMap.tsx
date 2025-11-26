@@ -83,7 +83,7 @@ export function LocationMap({
   isLoadingLocation = false,
 }: LocationMapProps) {
   return (
-    <Card className="w-full">
+    <Card className="w-full relative z-0">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
@@ -106,12 +106,12 @@ export function LocationMap({
       <CardContent>
         <div className="space-y-4">
           {/* Interactive Map */}
-          <div className="relative w-full h-96 rounded-lg overflow-hidden border border-border">
+          <div className="relative w-full h-96 rounded-lg overflow-hidden border border-border z-0">
             <MapContainer
               center={[userLat, userLng]}
               zoom={13}
               scrollWheelZoom={true}
-              style={{ height: '100%', width: '100%' }}
+              style={{ height: '100%', width: '100%', zIndex: 1 }}
             >
               <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
