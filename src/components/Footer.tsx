@@ -1,6 +1,9 @@
 import { Instagram, Linkedin, Facebook, Twitter, Globe } from 'lucide-react';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export function Footer() {
+  const { t } = useLanguage();
+
   return (
     <footer className="bg-primary text-primary-foreground mt-auto">
       <div className="container mx-auto px-4 py-8">
@@ -8,8 +11,8 @@ export function Footer() {
           {/* Brand */}
           <div className="text-center md:text-left">
             <h3 className="font-bold text-xl mb-1">Raune Launch</h3>
-            <p className="text-sm opacity-90">Quick & Easy Meals Delivered Fast</p>
-            <p className="text-xs opacity-75 mt-2">Built by Team 派手, Class ITSS-1 木2</p>
+            <p className="text-sm opacity-90">{t('footer.tagline')}</p>
+            <p className="text-xs opacity-75 mt-2">{t('footer.builtBy')}</p>
           </div>
 
           {/* Social Links */}
@@ -64,7 +67,7 @@ export function Footer() {
 
         {/* Copyright */}
         <div className="text-center text-xs opacity-75 mt-6 pt-4 border-t border-primary-foreground/20">
-          © 2025 Raune Launch. All rights reserved.
+          {t('footer.copyright')}
         </div>
       </div>
     </footer>

@@ -1,0 +1,111 @@
+{
+  "header": {
+    "home": "Trang chủ",
+    "search": "Tìm kiếm",
+    "recommendations": "Gợi ý",
+    "searchPlaceholder": "Tìm món ăn...",
+    "refreshLocation": "Làm mới vị trí",
+    "customer": "Khách hàng"
+  },
+  "hero": {
+    "title": "Raune Launch: Đặt món nhanh & tiện lợi!",
+    "subtitle": "Khám phá những món ăn ngon từ các nhà hàng tốt nhất gần bạn",
+    "findRestaurants": "Tìm nhà hàng",
+    "viewNearby": "Xem gần đây",
+    "fastDelivery": "Giao hàng nhanh",
+    "fastDeliveryDesc": "Giao hàng tận nơi nhanh chóng",
+    "highQuality": "Chất lượng cao",
+    "highQualityDesc": "Nhà hàng được đánh giá cao",
+    "nutrition": "Dinh dưỡng",
+    "nutritionDesc": "Món ăn tươi ngon & lành mạnh"
+  },
+  "location": {
+    "enableLocationTitle": "Bật định vị để nhận gợi ý tốt hơn!",
+    "enableLocationDesc": "Chúng tôi đang hiển thị kết quả cho Hà Nội theo mặc định.",
+    "tryAgain": "Thử lại",
+    "defaultLocation": "Hai Bà Trưng, Hanoi (mặc định)",
+    "yourLocation": "Vị trí của bạn",
+    "fallbackNote": "Đang sử dụng vị trí mặc định. Bật định vị để có kết quả chính xác hơn."
+  },
+  "sections": {
+    "recommendedDishes": "Món ăn được đề xuất",
+    "topRestaurants": "Nhà hàng hàng đầu gần bạn",
+    "seeMore": "Xem thêm",
+    "seeAll": "Xem tất cả"
+  },
+  "search": {
+    "backHome": "Về trang chủ",
+    "showMap": "Hiện bản đồ",
+    "hideMap": "Ẩn bản đồ",
+    "searchPlaceholder": "Tìm nhà hàng, món ăn... (VD: pho, ba dinh, banh mi)",
+    "searchButton": "Tìm kiếm",
+    "sortBy": "Sắp xếp theo",
+    "searchRadius": "Bán kính tìm kiếm: {{radius}} km",
+    "category": "Danh mục",
+    "restaurants": "Nhà hàng ({{count}})",
+    "searchFor": "Tìm kiếm: \"{{query}}\"",
+    "noResults": "Không tìm thấy nhà hàng nào.",
+    "clearFilters": "Thử xóa bộ lọc",
+    "searchTip": "💡 Mẹo: Tìm kiếm không phân biệt dấu - \"pho\" cũng tìm được \"Phở\", \"ba dinh\" tìm được \"Ba Đình\""
+  },
+  "sort": {
+    "rating": "Đánh giá cao nhất",
+    "distance": "Gần nhất",
+    "reviews": "Nhiều đánh giá nhất"
+  },
+  "distance": {
+    "within3km": "Trong vòng 3 km",
+    "within5km": "Trong vòng 5 km",
+    "within10km": "Trong vòng 10 km",
+    "within20km": "Trong vòng 20 km",
+    "within50km": "Trong vòng 50 km"
+  },
+  "categories": {
+    "all": "Tất cả",
+    "vietnamese": "Việt Nam",
+    "asian": "Châu Á",
+    "western": "Phương Tây",
+    "cafe": "Cà phê",
+    "fastFood": "Đồ ăn nhanh"
+  },
+  "common": {
+    "orderNow": "Đặt ngay",
+    "addedToCart": "{{dish}} đã thêm vào giỏ hàng!",
+    "from": "Từ {{restaurant}}",
+    "away": "cách đây",
+    "reviews": "đánh giá",
+    "viewMenu": "Xem thực đơn",
+    "hideMenu": "Ẩn thực đơn",
+    "featuredDishes": "Món ăn nổi bật"
+  },
+  "footer": {
+    "tagline": "Giao hàng nhanh chóng & tiện lợi",
+    "builtBy": "Phát triển bởi Team 派手, Class ITSS-1 木２",
+    "copyright": "© 2025 Raune Launch. Tất cả các quyền được bảo lưu."
+  },
+  "notFound": {
+    "title": "404",
+    "message": "Oops! Không tìm thấy trang",
+    "returnHome": "Quay về trang chủ"
+  },
+  "map": {
+    "locationMap": "Bản đồ vị trí",
+    "refreshLocation": "Làm mới vị trí",
+    "yourLocation": "Vị trí của bạn",
+    "restaurant": "Nhà hàng",
+    "distanceFromYou": "Cách bạn: {{distance}} km",
+    "nearbyRestaurants": "Nhà hàng gần bạn ({{count}}):",
+    "andMore": "... và {{count}} nhà hàng khác",
+    "instructions": "Hướng dẫn:",
+    "instructionsList": [
+      "Click vào marker để xem thông tin chi tiết",
+      "Kéo thả để di chuyển bản đồ",
+      "Cuộn chuột để zoom in/out",
+      "Marker xanh là vị trí của bạn, marker đỏ là nhà hàng"
+    ]
+  },
+  "languageSwitcher": {
+    "chooseLanguage": "Chọn ngôn ngữ",
+    "autoSave": "Lựa chọn ngôn ngữ được lưu tự động"
+  }
+}
