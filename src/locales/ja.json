@@ -66,7 +66,7 @@
     "asian": "アジア料理",
     "western": "西洋料理",
     "cafe": "カフェ",
-    "fastFood": "ファストフード"
+    "fast food": "ファーストフード"
   },
   "tags": {
     "Delivery": "デリバリー",
@@ -118,7 +118,23 @@
     "Egg Coffee": "エッグコーヒー",
     "Thai": "タイ料理",
     "Sandwich": "サンドイッチ",
-    "Healthy": "ヘルシー"
+    "Healthy": "ヘルシー",
+    "Bar": "バー",
+    "Curry": "カレー",
+    "Donburi": "丼",
+    "Izakaya": "居酒屋",
+    "Matcha": "抹茶",
+    "Noodles": "麺類",
+    "Okonomiyaki": "お好み焼き",
+    "Pork": "豚肉",
+    "Seafood": "シーフード",
+    "Soba": "そば",
+    "Sushi": "寿司",
+    "Sweet": "甘い",
+    "Takoyaki": "たこ焼き",
+    "Tempura": "天ぷら",
+    "Tonkatsu": "とんかつ",
+    "Udon": "うどん"
   },
   "common": {
     "orderNow": "今すぐ注文",
