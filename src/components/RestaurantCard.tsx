@@ -5,7 +5,7 @@ import { useLanguage } from '@/hooks/useLanguage';
 
 interface Dish {
   id: number;
-  name: string;
+  name: string | { vi: string; ja: string };
   price: number;
   rating: number;
   reviews: number;
@@ -38,7 +38,15 @@ export function RestaurantCard({
   dishes = [],
 }: RestaurantCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+
+  // Hàm helper để lấy tên món ăn theo ngôn ngữ
+  const getDishName = (dishName: string | { vi: string; ja: string }) => {
+    if (typeof dishName === 'string') {
+      return dishName;
+    }
+    return dishName[language as keyof typeof dishName] || dishName.vi;
+  };
 
   return (
     <div className="bg-card rounded-xl border border-border hover:shadow-md transition-all duration-300 overflow-hidden">
@@ -65,14 +73,14 @@ export function RestaurantCard({
         
         <div className="flex flex-wrap gap-1 mt-3">
           <span className="px-2 py-1 text-xs bg-secondary text-secondary-foreground rounded-full">
-            {category}
+            {t(`categories.${category.toLowerCase()}`) || category}
           </span>
           {tags.slice(0, 2).map((tag) => (
             <span
               key={tag}
               className="px-2 py-1 text-xs bg-accent/10 text-accent rounded-full"
             >
-              {tag}
+              {t(`tags.${tag}`) || tag}
             </span>
           ))}
         </div>
@@ -95,12 +103,12 @@ export function RestaurantCard({
                   <div key={dish.id} className="flex gap-3 bg-secondary/20 rounded-lg p-2">
                     <img
                       src={dish.photo}
-                      alt={dish.name}
+                      alt={getDishName(dish.name)}
                       className="w-16 h-16 object-cover rounded-md flex-shrink-0"
                       loading="lazy"
                     />
                     <div className="flex-1 min-w-0">
-                      <h5 className="font-medium text-sm text-card-foreground truncate">{dish.name}</h5>
+                      <h5 className="font-medium text-sm text-card-foreground truncate">{getDishName(dish.name)}</h5>
                       <div className="flex items-center gap-1 mt-0.5">
                         <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
                         <span className="text-xs text-muted-foreground">

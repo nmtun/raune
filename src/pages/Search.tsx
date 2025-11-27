@@ -70,10 +70,14 @@ const Search = () => {
       
       // Filter dishes by search query if exists (with flexible matching)
       if (searchQuery) {
-        const matchingDishes = dishes.filter((d) => 
-          flexibleMatch(d.name, searchQuery) ||
-          flexibleMatch(d.category, searchQuery)
-        );
+        const matchingDishes = dishes.filter((d) => {
+          // Kiểm tra tên món ăn
+          const dishNameMatch = typeof d.name === 'string' 
+            ? flexibleMatch(d.name, searchQuery)
+            : flexibleMatch(d.name.vi, searchQuery) || flexibleMatch(d.name.ja, searchQuery);
+          
+          return dishNameMatch || flexibleMatch(d.category, searchQuery);
+        });
         // If there are matching dishes, show them; otherwise show top 3 dishes
         dishes = matchingDishes.length > 0 ? matchingDishes.slice(0, 3) : dishes.slice(0, 3);
       } else {

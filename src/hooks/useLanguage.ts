@@ -11,6 +11,7 @@ export const useLanguage = () => {
 
   return {
     t,
+    language: currentLanguage,
     currentLanguage,
     changeLanguage,
     isVietnamese: currentLanguage === 'vi',
