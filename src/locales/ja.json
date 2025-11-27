@@ -74,6 +74,8 @@
     "from": "{{restaurant}}から",
     "away": "離れた場所",
     "reviews": "レビュー",
+    "viewDetails": "詳細を見る",
+    "viewing": "{{dish}}の詳細を表示しています",
     "viewMenu": "メニューを見る",
     "hideMenu": "メニューを隠す",
     "featuredDishes": "おすすめ料理"

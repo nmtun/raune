@@ -24,10 +24,8 @@ export function DishCard({
 }: DishCardProps) {
   const { t } = useLanguage();
 
-  const handleOrder = () => {
-    toast.success(t('common.addedToCart', { dish: name }), {
-      description: t('common.from', { restaurant: restaurantName }),
-    });
+  const handleViewDetails = () => {
+    toast(t('common.viewing', { dish: name }));
   };
 
   return (
@@ -55,11 +53,11 @@ export function DishCard({
         </p>
         
         <Button
-          onClick={handleOrder}
+          onClick={handleViewDetails}
           className="w-full mt-auto"
           size="sm"
         >
-          {t('common.orderNow')}
+          {t('common.viewDetails')}
         </Button>
       </div>
     </div>

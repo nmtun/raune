@@ -74,6 +74,8 @@
     "from": "Từ {{restaurant}}",
     "away": "cách đây",
     "reviews": "đánh giá",
+    "viewDetails": "Xem chi tiết",
+    "viewing": "Đang xem {{dish}}",
     "viewMenu": "Xem thực đơn",
     "hideMenu": "Ẩn thực đơn",
     "featuredDishes": "Món ăn nổi bật"

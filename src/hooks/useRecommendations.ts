@@ -60,38 +60,26 @@ export function useRecommendations(userLat: number, userLng: number, maxDistance
         // Skip if too far
         if (distance > maxDistance) return null;
 
-        // Calculate score
-        let score = 0;
-
-        // Preference bonus (category match)
-        if (user.prefs.includes(menu.category)) {
-          score += 3;
-        }
-
-        // Rating bonus
-        score += menu.rating;
-
-        // Distance penalty (closer is better)
-        score += (maxDistance - distance) * 2;
-
-        // History bonus (previously ordered)
-        if (user.history.includes(restaurant.id)) {
-          score += 1;
-        }
-
         return {
           restaurant,
           menu,
           distance,
-          score,
+          score: 0, // Not used for sorting anymore
         };
       })
       .filter((item): item is RecommendationScore & { menu: Menu } => item !== null && item.menu !== undefined)
-      .sort((a, b) => b.score - a.score)
+      .sort((a, b) => {
+        // Sort by distance first (ascending)
+        if (a.distance !== b.distance) {
+          return a.distance - b.distance;
+        }
+        // If distance is the same, sort by rating (descending)
+        return (b.menu?.rating || 0) - (a.menu?.rating || 0);
+      })
       .slice(0, 8);
 
     return scored;
-  }, [userLat, userLng]);
+  }, [userLat, userLng, maxDistance]);
 
   const recommendedRestaurants = useMemo(() => {
     const restaurants = restaurantsData as Restaurant[];
@@ -108,32 +96,21 @@ export function useRecommendations(userLat: number, userLng: number, maxDistance
         // Skip if too far
         if (distance > maxDistance) return null;
 
-        let score = 0;
-
-        // Preference bonus
-        if (user.prefs.includes(restaurant.category)) {
-          score += 3;
-        }
-
-        // Rating bonus
-        score += restaurant.rating * 2;
-
-        // Distance bonus
-        score += (maxDistance - distance) * 2;
-
-        // History bonus
-        if (user.history.includes(restaurant.id)) {
-          score += 2;
-        }
-
         return {
           restaurant,
           distance,
-          score,
+          score: 0, // Not used for sorting anymore
         };
       })
       .filter((item): item is RecommendationScore => item !== null)
-      .sort((a, b) => b.score - a.score)
+      .sort((a, b) => {
+        // Sort by distance first (ascending)
+        if (a.distance !== b.distance) {
+          return a.distance - b.distance;
+        }
+        // If distance is the same, sort by rating (descending)
+        return b.restaurant.rating - a.restaurant.rating;
+      })
       .slice(0, 7);
 
     return scored;
