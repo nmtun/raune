@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { useLanguage } from '@/hooks/useLanguage';
 
 interface DishCardProps {
-  name: string;
+  name: string | { vi: string; ja: string };
   restaurantName: string;
   distance: string;
   rating: number;
@@ -22,7 +22,17 @@ export function DishCard({
   price,
   photo,
 }: DishCardProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+
+  // Lấy tên món ăn theo ngôn ngữ hiện tại
+  const getDishName = () => {
+    if (typeof name === 'string') {
+      return name;
+    }
+    return name[language as keyof typeof name] || name.vi;
+  };
+
+  const dishName = getDishName();
 
   const handleViewDetails = () => {
     toast(t('common.viewing', { dish: name }));
@@ -32,12 +42,12 @@ export function DishCard({
     <div className="flex-shrink-0 w-64 bg-card rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col">
       <img
         src={photo}
-        alt={name}
+        alt={dishName}
         className="w-full h-40 object-cover"
         loading="lazy"
       />
       <div className="p-4 flex flex-col flex-1">
-        <h3 className="font-bold text-lg text-card-foreground line-clamp-1">{name}</h3>
+        <h3 className="font-bold text-lg text-card-foreground line-clamp-1">{dishName}</h3>
         <p className="text-sm text-muted-foreground line-clamp-1">{restaurantName}</p>
         <p className="text-xs text-accent font-medium mt-1">{distance} {t('common.away')}</p>
         

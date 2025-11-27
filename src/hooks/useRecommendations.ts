@@ -20,7 +20,7 @@ interface Restaurant {
 interface Menu {
   id: number;
   restaurantId: number;
-  name: string;
+  name: string | { vi: string; ja: string };
   category: string;
   price: number;
   rating: number;

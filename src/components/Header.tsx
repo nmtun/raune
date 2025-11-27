@@ -77,7 +77,7 @@ export function Header({
               onClick={handleRecommendationsClick}
               className="text-foreground hover:text-primary transition-colors cursor-pointer"
             >
-              Recommendations
+              {t('header.recommendations')}
             </button>
           </nav>
 
