@@ -927,7 +927,7 @@
     "restaurantId": 30,
     "name": {
       "vi": "Tonkotsu Ramen",
-      "ja": "Tonkotsu Ramen"
+      "ja": "豚骨ラーメン"
     },
     "category": "Asian",
     "price": 120000,
@@ -940,7 +940,7 @@
     "restaurantId": 30,
     "name": {
       "vi": "Miso Ramen",
-      "ja": "Miso Ramen"
+      "ja": "味噌ラーメン"
     },
     "category": "Asian",
     "price": 110000,
@@ -953,7 +953,7 @@
     "restaurantId": 30,
     "name": {
       "vi": "Spicy Ramen",
-      "ja": "Spicy Ramen"
+      "ja": "辛口ラーメン"
     },
     "category": "Asian",
     "price": 115000,
@@ -1187,7 +1187,7 @@
     "restaurantId": 38,
     "name": {
       "vi": "Phở Cuốn Đặc Biệt",
-      "ja": "Phở Cuốn Đặc Biệt"
+      "ja": "特製フォー巻き"
     },
     "category": "Vietnamese",
     "price": 50000,
@@ -1252,7 +1252,7 @@
     "restaurantId": 40,
     "name": {
       "vi": "Bún Ốc Riêu",
-      "ja": "Bún Ốc Riêu"
+      "ja": "巻貝トマトビーフン"
     },
     "category": "Vietnamese",
     "price": 40000,
@@ -1265,7 +1265,7 @@
     "restaurantId": 41,
     "name": {
       "vi": "Fried Chicken Set",
-      "ja": "Fried Chicken Set"
+      "ja": "フライドチキンセット"
     },
     "category": "Fast Food",
     "price": 90000,
@@ -1278,7 +1278,7 @@
     "restaurantId": 41,
     "name": {
       "vi": "Burger Combo",
-      "ja": "Burger Combo"
+      "ja": "バーガーコンボ"
     },
     "category": "Fast Food",
     "price": 85000,
@@ -1304,7 +1304,7 @@
     "restaurantId": 42,
     "name": {
       "vi": "Bánh Tôm Đặc Biệt",
-      "ja": "Bánh Tôm Đặc Biệt"
+      "ja": "特製エビのかき揚げ"
     },
     "category": "Vietnamese",
     "price": 100000,
@@ -1317,7 +1317,7 @@
     "restaurantId": 43,
     "name": {
       "vi": "Yakiniku Set for 2",
-      "ja": "Yakiniku Set for 2"
+      "ja": "焼肉セット2人前"
     },
     "category": "Asian",
     "price": 400000,
@@ -1330,7 +1330,7 @@
     "restaurantId": 43,
     "name": {
       "vi": "Premium Wagyu Set",
-      "ja": "Premium Wagyu Set"
+      "ja": "プレミアム和牛セット"
     },
     "category": "Asian",
     "price": 600000,
@@ -1343,7 +1343,7 @@
     "restaurantId": 44,
     "name": {
       "vi": "Chè Thập Cẩm",
-      "ja": "Chè Thập Cẩm"
+      "ja": "ミックスぜんざい"
     },
     "category": "Vietnamese",
     "price": 25000,
@@ -1356,7 +1356,7 @@
     "restaurantId": 44,
     "name": {
       "vi": "Chè Bưởi",
-      "ja": "Chè Bưởi"
+      "ja": "ざぼんぜんざい"
     },
     "category": "Vietnamese",
     "price": 20000,
@@ -1369,7 +1369,7 @@
     "restaurantId": 45,
     "name": {
       "vi": "Italian BMT",
-      "ja": "Italian BMT"
+      "ja": "イタリアンBMT"
     },
     "category": "Fast Food",
     "price": 75000,
@@ -1382,7 +1382,7 @@
     "restaurantId": 45,
     "name": {
       "vi": "Veggie Delite",
-      "ja": "Veggie Delite"
+      "ja": "ベジー・デライト"
     },
     "category": "Fast Food",
     "price": 65000,
@@ -1395,7 +1395,7 @@
     "restaurantId": 46,
     "name": {
       "vi": "Bò Né 3 Trứng",
-      "ja": "Bò Né 3 Trứng"
+      "ja": "牛肉と3個卵の鉄板焼き"
     },
     "category": "Vietnamese",
     "price": 55000,
@@ -1408,7 +1408,7 @@
     "restaurantId": 46,
     "name": {
       "vi": "Bò Né Đặc Biệt",
-      "ja": "Bò Né Đặc Biệt"
+      "ja": "特製牛肉鉄板焼き"
     },
     "category": "Vietnamese",
     "price": 70000,
@@ -1421,7 +1421,7 @@
     "restaurantId": 47,
     "name": {
       "vi": "Sushi Buffet",
-      "ja": "Sushi Buffet"
+      "ja": "寿司バイキング"
     },
     "category": "Asian",
     "price": 299000,

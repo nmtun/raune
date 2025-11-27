@@ -66,7 +66,7 @@
     "asian": "Châu Á",
     "western": "Phương Tây",
     "cafe": "Cà phê",
-    "fastFood": "Đồ ăn nhanh"
+    "fast food": "Đồ ăn nhanh"
   },
   "tags": {
     "Delivery": "Giao hàng",
@@ -118,7 +118,23 @@
     "Egg Coffee": "Cà phê trứng",
     "Thai": "Thái Lan",
     "Sandwich": "Bánh mì kẹp",
-    "Healthy": "Lành mạnh"
+    "Healthy": "Lành mạnh",
+    "Bar": "Quầy bar",
+    "Curry": "Cà ri",
+    "Donburi": "Cơm thịt Nhật",
+    "Izakaya": "Quán rượu Nhật",
+    "Matcha": "Trà xanh",
+    "Noodles": "Mì",
+    "Okonomiyaki": "Bánh xèo Nhật",
+    "Pork": "Thịt heo",
+    "Seafood": "Hải sản",
+    "Soba": "Mì soba",
+    "Sushi": "Sushi",
+    "Sweet": "Ngọt",
+    "Takoyaki": "Bánh bạch tuộc",
+    "Tempura": "Tempura",
+    "Tonkatsu": "Thịt heo chiên xù",
+    "Udon": "Mì udon"
   },
   "common": {
     "orderNow": "Đặt ngay",
