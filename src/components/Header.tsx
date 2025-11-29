@@ -73,6 +73,9 @@ export function Header({
             <Link to="/search" className="text-foreground hover:text-primary transition-colors">
               {t('header.search')}
             </Link>
+            <Link to="/survey" className="text-foreground hover:text-primary transition-colors">
+              {t('header.survey')}
+            </Link>
             <button
               onClick={handleRecommendationsClick}
               className="text-foreground hover:text-primary transition-colors cursor-pointer"

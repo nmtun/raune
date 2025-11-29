@@ -255,7 +255,7 @@ const Search = () => {
                         case 'Asian': return t('categories.asian');
                         case 'Western': return t('categories.western');
                         case 'Cafe': return t('categories.cafe');
-                        case 'Fast Food': return t('categories.fastFood');
+                        case 'Fast Food': return t('categories.fast food');
                         default: return cat;
                       }
                     };
