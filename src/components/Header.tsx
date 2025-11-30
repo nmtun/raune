@@ -137,6 +137,16 @@ export function Header({
               <LanguageSwitcher />
             </div>
 
+            {/* Register/Login Button */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/register')}
+              className="hidden md:flex"
+            >
+              {t('register.registerButton')}
+            </Button>
+
             {/* User profile */}
             <div className="flex items-center space-x-2 px-3 py-1.5 bg-muted/60 rounded-lg border border-border/30 hover:bg-muted transition-colors duration-200">
               <User className="w-4 h-4 text-primary" />
