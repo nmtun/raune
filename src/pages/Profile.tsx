@@ -105,7 +105,6 @@ const Profile: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-orange-50 via-white to-orange-50">
       <Header
         location={location.isFallback ? t('location.defaultLocation') : t('location.yourLocation')}
-        userName={t('header.customer')}
         onRefreshLocation={handleRefreshLocation}
         isLoadingLocation={location.loading}
         isFallbackLocation={location.isFallback}

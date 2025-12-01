@@ -1,13 +1,13 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Search, MapPin, User, RefreshCw } from 'lucide-react';
+import { Search, MapPin, User, RefreshCw, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { toast } from '@/hooks/use-toast';
 
 interface HeaderProps {
   location?: string;
-  userName?: string;
   onRefreshLocation?: () => void;
   isLoadingLocation?: boolean;
   isFallbackLocation?: boolean;
@@ -15,7 +15,6 @@ interface HeaderProps {
 
 export function Header({ 
   location = "Hai Bà Trưng, Hanoi", 
-  userName = "Customer",
   onRefreshLocation,
   isLoadingLocation = false,
   isFallbackLocation = false,
@@ -24,6 +23,57 @@ export function Header({
   const currentLocation = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const { t } = useLanguage();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState<string>('');
+
+  // Check if user is logged in
+  useEffect(() => {
+    const checkSession = () => {
+      const sessionData = localStorage.getItem('userSession');
+      if (sessionData) {
+        try {
+          const session = JSON.parse(sessionData);
+          const now = new Date().getTime();
+          
+          // Check if session is still valid
+          if (session.expiresAt && now < session.expiresAt) {
+            setIsLoggedIn(true);
+            setCurrentUser(session.username || session.email);
+          } else {
+            // Session expired
+            localStorage.removeItem('userSession');
+            setIsLoggedIn(false);
+            setCurrentUser('');
+          }
+        } catch (error) {
+          localStorage.removeItem('userSession');
+          setIsLoggedIn(false);
+          setCurrentUser('');
+        }
+      } else {
+        setIsLoggedIn(false);
+        setCurrentUser('');
+      }
+    };
+
+    checkSession();
+    
+    // Check session every minute
+    const interval = setInterval(checkSession, 60000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('userSession');
+    setIsLoggedIn(false);
+    setCurrentUser('');
+    toast({
+      title: t('header.logoutSuccess') || 'Đăng xuất thành công',
+      description: t('header.logoutSuccessDesc') || 'Hẹn gặp lại bạn!',
+    });
+    navigate('/');
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -137,21 +187,65 @@ export function Header({
               <LanguageSwitcher />
             </div>
 
-            {/* Register/Login Button */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate('/register')}
-              className="hidden md:flex"
-            >
-              {t('register.registerButton')}
-            </Button>
+            {/* Guest: Show Login and Register buttons */}
+            {!isLoggedIn ? (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate('/login')}
+                  className="hidden md:flex"
+                >
+                  {t('header.login') || 'Đăng nhập'}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate('/register')}
+                  className="hidden md:flex"
+                >
+                  {t('header.register') || 'Đăng ký'}
+                </Button>
+              </>
+            ) : (
+              <>
+                {/* Logged in: Show user profile and logout */}
+                <div className="flex items-center space-x-2 px-3 py-1.5 bg-muted/60 rounded-lg border border-border/30 hover:bg-muted transition-colors duration-200 cursor-pointer" onClick={() => navigate('/profile')}>
+                  <User className="w-4 h-4 text-primary" />
+                  <span className="text-sm font-medium hidden sm:inline">{currentUser}</span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleLogout}
+                  className="hidden md:flex items-center gap-2"
+                >
+                  <LogOut className="w-4 h-4" />
+                  {t('header.logout') || 'Đăng xuất'}
+                </Button>
+              </>
+            )}
 
-            {/* User profile */}
-            <div className="flex items-center space-x-2 px-3 py-1.5 bg-muted/60 rounded-lg border border-border/30 hover:bg-muted transition-colors duration-200">
-              <User className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium hidden sm:inline">{userName}</span>
-            </div>
+            {/* Mobile: Show icon only */}
+            {!isLoggedIn ? (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden"
+                onClick={() => navigate('/login')}
+              >
+                <User className="w-5 h-5" />
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden"
+                onClick={() => navigate('/profile')}
+              >
+                <User className="w-5 h-5 text-primary" />
+              </Button>
+            )}
           </div>
         </div>
       </div>

@@ -216,7 +216,6 @@ const MyReviews = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Header
         location={t('location.yourLocation')}
-        userName={currentUser.username}
         onRefreshLocation={() => {}}
         isLoadingLocation={false}
         isFallbackLocation={false}

@@ -154,7 +154,6 @@ const Search = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Header 
         location={location.isFallback ? t('location.defaultLocation') : t('location.yourLocation')}
-        userName={t('header.customer')}
         onRefreshLocation={handleRefreshLocation}
         isLoadingLocation={location.loading}
         isFallbackLocation={location.isFallback}
