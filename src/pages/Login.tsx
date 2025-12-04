@@ -8,7 +8,20 @@ import { useLanguage } from '@/hooks/useLanguage';
 import { ArrowLeft, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import accountsData from '@/data/accounts.json';
-import usersData from '@/data/users.json';
+
+interface Account {
+  id: number;
+  username: string;
+  name?: string;
+  email: string;
+  password: string;
+  profileImage?: string;
+  lat?: number;
+  lng?: number;
+  prefs?: string[];
+  history?: number[];
+  createdAt: string;
+}
 
 const Login = () => {
   const { t } = useLanguage();
@@ -69,10 +82,33 @@ const Login = () => {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // Check credentials
-    const account = accountsData.find(
+    // Check credentials in accounts.json first
+    let account: Account | undefined = accountsData.find(
       acc => acc.email === email && acc.password === password
-    );
+    ) as Account | undefined;
+    
+    console.log('Account from JSON:', account);
+    
+    // If not found in accounts.json, check localStorage for newly registered accounts
+    if (!account) {
+      const registeredAccounts = localStorage.getItem('accounts');
+      console.log('Registered accounts from localStorage:', registeredAccounts);
+      
+      if (registeredAccounts) {
+        try {
+          const accounts: Account[] = JSON.parse(registeredAccounts);
+          console.log('Parsed accounts:', accounts);
+          console.log('Looking for email:', email, 'password:', password);
+          
+          account = accounts.find(
+            (acc) => acc.email === email && acc.password === password
+          );
+          console.log('Found account in localStorage:', account);
+        } catch (error) {
+          console.error('Error parsing registered accounts:', error);
+        }
+      }
+    }
     
     if (!account) {
       setLoading(false);
@@ -84,15 +120,14 @@ const Login = () => {
       return;
     }
     
-    // Find user data
-    const user = usersData.find(u => u.user_id === account.id);
-    
     // Store session data (in localStorage for simplicity)
     const loginTime = new Date().getTime();
     const sessionData = {
       userId: account.id,
       email: account.email,
       username: account.username,
+      name: account.name,
+      profileImage: account.profileImage,
       loginTime,
       expiresAt: loginTime + (30 * 24 * 60 * 60 * 1000), // 30 days
     };
@@ -104,10 +139,11 @@ const Login = () => {
     const isNewAccount = (loginTime - accountCreatedAt) < (7 * 24 * 60 * 60 * 1000); // 7 days
     
     // Check if user has preferences
-    const hasPreferences = user && user.prefs && user.prefs.length > 0;
+    const hasPreferences = account.prefs && account.prefs.length > 0;
     
     setLoading(false);
     
+    // If no preferences or new account -> go to survey
     if (!hasPreferences || isNewAccount) {
       // First time login or no preferences - redirect to survey
       toast({
@@ -118,7 +154,7 @@ const Login = () => {
         navigate('/survey');
       }, 1500);
     } else {
-      // Regular login - redirect to home
+      // Regular login with preferences - redirect to home
       toast({
         title: t('login.loginSuccess'),
         description: t('login.loginSuccessDesc'),
