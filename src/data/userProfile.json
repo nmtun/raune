@@ -1,27 +1,39 @@
 [
   {
     "id": 1,
-    "username": "nguyenvana",
-    "name": "Nguyen Van A",
-    "email": "abc.rauma@gmail.com",
-    "password": "password123",
-    "profileImage": "/profile-image/avt1.jpg"
+    "username": "customer1",
+    "name": "Nguyễn Văn A",
+    "email": "customer1@example.com",
+    "password": "Password123!",
+    "profileImage": "/profile-image/avt1.jpg",
+    "lat": 21.0278,
+    "lng": 105.8342,
+    "prefs": ["Vietnamese", "Asian"],
+    "history": [1, 3, 6, 12, 20]
   },
   {
     "id": 2,
-    "username": "tranthib",
-    "name": "Tran Thi B",
-    "email": "tranthi.b@example.com",
-    "password": "password123",
-    "profileImage": "/profile-image/avt2.jpg"
+    "username": "customer2",
+    "name": "Trần Thị B",
+    "email": "customer2@example.com",
+    "password": "Password456!",
+    "profileImage": "/profile-image/avt2.jpg",
+    "lat": 21.0285,
+    "lng": 105.8350,
+    "prefs": ["Japanese", "Korean"],
+    "history": [2, 5, 8, 15]
   },
   {
     "id": 3,
-    "username": "levanc",
-    "name": "Le Van C",
-    "email": "levan.c@example.com",
-    "password": "password123",
-    "profileImage": "/profile-image/avt3.jpg"
+    "username": "newuser",
+    "name": "Lê Văn C",
+    "email": "newuser@example.com",
+    "password": "NewUser123!",
+    "profileImage": "/profile-image/avt3.jpg",
+    "lat": 21.0290,
+    "lng": 105.8360,
+    "prefs": [],
+    "history": []
   }
 ]
 
