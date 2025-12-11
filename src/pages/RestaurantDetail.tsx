@@ -7,10 +7,23 @@ import { ReviewSection } from '@/components/ReviewSection';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { useLanguage } from '@/hooks/useLanguage';
 import { ArrowLeft, MapPin, Star } from 'lucide-react';
-import restaurantsData from '@/data/restaurants.json';
 import menusData from '@/data/menus.json';
 import { formatDistance, calculateDistance } from '@/utils/distance';
-import { useState } from 'react';
+import { getRestaurantById } from '@/utils/restaurantUtils';
+import { useState, useEffect } from 'react';
+
+interface Restaurant {
+  id: number;
+  name: string;
+  address: string;
+  lat: number;
+  lng: number;
+  category: string;
+  rating: number;
+  reviews: number;
+  tags: string[];
+  photo: string;
+}
 
 const RestaurantDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -18,12 +31,53 @@ const RestaurantDetail = () => {
   const location = useGeolocation();
   const { t, language } = useLanguage();
   const [selectedDish, setSelectedDish] = useState<any | null>(null);
+  const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+  const [restaurantMenus, setRestaurantMenus] = useState<any[]>([]);
 
-  // Find restaurant by ID
-  const restaurant = restaurantsData.find((r) => r.id === Number(id));
+  // Load restaurant from localStorage
+  useEffect(() => {
+    const restaurantId = Number(id);
+    if (restaurantId) {
+      const restaurantData = getRestaurantById(restaurantId);
+      setRestaurant(restaurantData);
+      setRestaurantMenus(menusData.filter((m) => m.restaurantId === restaurantId));
+    }
+  }, [id]);
 
-  // Find menus for this restaurant
-  const restaurantMenus = menusData.filter((m) => m.restaurantId === Number(id));
+  // Update restaurant stats when reviews change (listen to localStorage changes)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const restaurantId = Number(id);
+      if (restaurantId && restaurant) {
+        const updatedRestaurant = getRestaurantById(restaurantId);
+        if (updatedRestaurant) {
+          setRestaurant(updatedRestaurant);
+        }
+      }
+    };
+
+    // Listen for storage events (when reviews are updated in other tabs/components)
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also check periodically for changes (in case same tab updates)
+    const interval = setInterval(() => {
+      const restaurantId = Number(id);
+      if (restaurantId && restaurant) {
+        const updatedRestaurant = getRestaurantById(restaurantId);
+        if (updatedRestaurant && (
+          updatedRestaurant.rating !== restaurant.rating || 
+          updatedRestaurant.reviews !== restaurant.reviews
+        )) {
+          setRestaurant(updatedRestaurant);
+        }
+      }
+    }, 1000); // Check every second
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, [id, restaurant]);
 
   // Calculate distance
   const distance = restaurant
@@ -37,6 +91,7 @@ const RestaurantDetail = () => {
     }
     return dishName[language as keyof typeof dishName] || dishName.vi;
   };
+  
 
   if (!restaurant) {
     return (

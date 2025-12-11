@@ -28,7 +28,7 @@ import { Star, Pencil, Trash2, MessageSquare, Search, UtensilsCrossed } from 'lu
 import { toast } from 'sonner';
 import reviewsData from '@/data/reviews.json';
 import menusData from '@/data/menus.json';
-import { getCurrentAccountFromSession } from '@/utils/profileUtils';
+import { getCurrentAccountFromSession, getAllAccounts } from '@/utils/profileUtils';
 
 interface Review {
   id: number;
@@ -71,18 +71,57 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
   const session = getCurrentAccountFromSession();
   const currentUserId = session?.userId || 1;
 
-  // Get restaurant dishes
+  // Get restaurant dishes (recalculated on each render when restaurantId changes)
   const restaurantDishes = menusData.filter((m) => m.restaurantId === restaurantId);
+
+  // Get user info from localStorage by userId
+  const getUserInfo = (userId: number) => {
+    const allAccounts = getAllAccounts();
+    const account = allAccounts.find((acc) => acc.id === userId);
+    if (account) {
+      return {
+        username: account.username || `User ${userId}`,
+        profileImage: account.profileImage || `/profile-image/avt1.jpg`,
+      };
+    }
+    // Fallback nếu không tìm thấy
+    return {
+      username: `User ${userId}`,
+      profileImage: `https://api.dicebear.com/7.x/avataaars/svg?seed=${userId}`,
+    };
+  };
 
   // Load reviews from localStorage or JSON
   useEffect(() => {
+    
     // Try to load from localStorage first
     const savedReviews = localStorage.getItem('reviews');
     let allReviews: Review[] = [];
     
     if (savedReviews) {
       try {
-        allReviews = JSON.parse(savedReviews);
+        const parsedReviews = JSON.parse(savedReviews);
+        // Merge với dữ liệu từ JSON để đảm bảo có đầy đủ reviews
+        // Tạo map từ JSON để merge
+        const jsonReviewsMap = new Map((reviewsData as Review[]).map(r => [r.id, r]));
+        const savedReviewsMap = new Map(parsedReviews.map((r: Review) => [r.id, r]));
+        
+        // Merge: ưu tiên reviews từ localStorage (có thể đã được edit), nhưng thêm reviews mới từ JSON
+        const mergedReviews = new Map();
+        
+        // Thêm tất cả reviews từ localStorage (đã được edit)
+        savedReviewsMap.forEach((review, id) => {
+          mergedReviews.set(id, review);
+        });
+        
+        // Thêm reviews từ JSON nếu chưa có trong localStorage
+        jsonReviewsMap.forEach((review, id) => {
+          if (!mergedReviews.has(id)) {
+            mergedReviews.set(id, review);
+          }
+        });
+        
+        allReviews = Array.from(mergedReviews.values());
       } catch (error) {
         console.error('Error parsing saved reviews:', error);
         allReviews = reviewsData as Review[];
@@ -101,7 +140,7 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
       (r) => r.type === 'dish' && restaurantDishes.some((d) => d.id === r.targetId)
     );
     setReviews([...restaurantReviews, ...dishReviews]);
-  }, [restaurantId]);
+  }, [restaurantId, restaurantDishes]);
 
   // Save reviews to localStorage whenever they change
   useEffect(() => {
@@ -134,7 +173,7 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
       // Save back to localStorage
       localStorage.setItem('reviews', JSON.stringify(allReviews));
     }
-  }, [reviews, restaurantId]);
+  }, [reviews, restaurantId, restaurantDishes]);
 
   // Filter and sort reviews
   const filteredReviews = reviews
@@ -433,6 +472,7 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
               const isOwner = review.userId === currentUserId;
               const targetName =
                 review.type === 'restaurant' ? restaurantName : getDishName(review.targetId);
+              const userInfo = getUserInfo(review.userId);
 
               return (
                 <div
@@ -441,15 +481,15 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
                 >
                   <div className="flex items-start gap-3">
                     <img
-                      src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${review.userId}`}
-                      alt={isOwner ? (session?.username || 'User') : `User ${review.userId}`}
-                      className="w-12 h-12 rounded-full border-2 border-background"
+                      src={userInfo.profileImage}
+                      alt={userInfo.username}
+                      className="w-12 h-12 rounded-full border-2 border-background object-cover"
                     />
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-2">
                         <div>
                           <span className="font-bold text-foreground">
-                            {isOwner ? (session?.username || t('review.you')) : `User ${review.userId}`}
+                            {isOwner ? (session?.username || t('review.you')) : userInfo.username}
                           </span>
                           {review.isEdited && (
                             <span className="text-xs text-muted-foreground ml-2">
@@ -485,29 +525,6 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
                       <p className="text-sm text-foreground/90 leading-relaxed mb-3">
                         {review.comment}
                       </p>
-                      {isOwner && (
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleOpenEditDialog(review)}
-                          >
-                            <Pencil className="w-3 h-3 mr-1" />
-                            {t('review.edit')}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => {
-                              setSelectedReview(review);
-                              setIsDeleteDialogOpen(true);
-                            }}
-                          >
-                            <Trash2 className="w-3 h-3 mr-1" />
-                            {t('review.delete')}
-                          </Button>
-                        </div>
-                      )}
                     </div>
                   </div>
                 </div>
