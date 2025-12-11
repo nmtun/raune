@@ -320,7 +320,9 @@
     "deleteSuccess": "Đánh giá đã được xóa",
     "deleteConfirmTitle": "Xác nhận xóa",
     "deleteConfirmMessage": "Bạn có chắc muốn xóa đánh giá này không?",
-    "confirmDelete": "Xóa"
+    "confirmDelete": "Xóa",
+    "loginRequired": "Yêu cầu đăng nhập",
+    "loginRequiredDesc": "Vui lòng đăng nhập để viết đánh giá"
   },
   "register": {
     "title": "Đăng ký tài khoản",

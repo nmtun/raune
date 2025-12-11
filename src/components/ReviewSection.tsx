@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
@@ -71,8 +71,20 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
   const session = getCurrentAccountFromSession();
   const currentUserId = session?.userId || -1;
 
-  // Get restaurant dishes (recalculated on each render when restaurantId changes)
-  const restaurantDishes = menusData.filter((m) => m.restaurantId === restaurantId);
+  // Get restaurant dishes (memoized to prevent unnecessary re-renders)
+  const restaurantDishes = useMemo(
+    () => menusData.filter((m) => m.restaurantId === restaurantId),
+    [restaurantId]
+  );
+  
+  // Track dish IDs for filtering
+  const dishIds = useMemo(
+    () => new Set(restaurantDishes.map((d) => d.id)),
+    [restaurantDishes]
+  );
+  
+  // Use ref to track if we're initializing to prevent save loop
+  const isInitializing = useRef(true);
 
   // Get user info from localStorage by userId
   const getUserInfo = (userId: number) => {
@@ -93,6 +105,7 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
 
   // Load reviews from localStorage or JSON
   useEffect(() => {
+    isInitializing.current = true;
     
     // Try to load from localStorage first
     const savedReviews = localStorage.getItem('reviews');
@@ -137,14 +150,24 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
       (r) => r.type === 'restaurant' && r.targetId === restaurantId
     );
     const dishReviews = allReviews.filter(
-      (r) => r.type === 'dish' && restaurantDishes.some((d) => d.id === r.targetId)
+      (r) => r.type === 'dish' && dishIds.has(r.targetId)
     );
     setReviews([...restaurantReviews, ...dishReviews]);
-  }, [restaurantId, restaurantDishes]);
+    
+    // Mark initialization as complete after a short delay
+    setTimeout(() => {
+      isInitializing.current = false;
+    }, 100);
+  }, [restaurantId, dishIds]);
 
-  // Save reviews to localStorage whenever they change
+  // Save reviews to localStorage whenever they change (but not during initialization)
   useEffect(() => {
-    if (reviews.length > 0) {
+    // Skip saving during initialization to prevent infinite loop
+    if (isInitializing.current) {
+      return;
+    }
+    
+    if (reviews.length >= 0) {
       // Get all reviews from localStorage
       const savedReviews = localStorage.getItem('reviews');
       let allReviews: Review[] = [];
@@ -163,7 +186,7 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
       allReviews = allReviews.filter(
         (r) => !(
           (r.type === 'restaurant' && r.targetId === restaurantId) ||
-          (r.type === 'dish' && restaurantDishes.some((d) => d.id === r.targetId))
+          (r.type === 'dish' && dishIds.has(r.targetId))
         )
       );
       
@@ -173,7 +196,7 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
       // Save back to localStorage
       localStorage.setItem('reviews', JSON.stringify(allReviews));
     }
-  }, [reviews, restaurantId, restaurantDishes]);
+  }, [reviews, restaurantId, dishIds]);
 
   // Filter and sort reviews
   const filteredReviews = reviews
@@ -210,6 +233,12 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
 
   // Open create dialog
   const handleOpenCreateDialog = (type?: 'restaurant' | 'dish', dishId?: number) => {
+    // Check if user is logged in
+    if (currentUserId === -1) {
+      toast.error(`${t('review.loginRequired')}: ${t('review.loginRequiredDesc')}`);
+      return;
+    }
+    
     setReviewType(type || 'restaurant');
     setSelectedDishId(dishId || null);
     setSelectedReview(null);
@@ -285,9 +314,22 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
       setReviews(updatedReviews);
       toast.success(t('review.updateSuccess'));
     } else {
-      // Create
+      // Create - get max ID from all reviews in localStorage to avoid conflicts
+      const savedReviews = localStorage.getItem('reviews');
+      let maxId = 0;
+      if (savedReviews) {
+        try {
+          const allReviews = JSON.parse(savedReviews);
+          maxId = allReviews.length > 0 ? Math.max(...allReviews.map((r: Review) => r.id), 0) : 0;
+        } catch (error) {
+          maxId = reviews.length > 0 ? Math.max(...reviews.map((r) => r.id), 0) : 0;
+        }
+      } else {
+        maxId = reviews.length > 0 ? Math.max(...reviews.map((r) => r.id), 0) : 0;
+      }
+      
       const newReview: Review = {
-        id: Math.max(...reviews.map((r) => r.id), 0) + 1,
+        id: maxId + 1,
         userId: currentUserId,
         type: reviewType,
         targetId: reviewType === 'restaurant' ? restaurantId : selectedDishId!,
@@ -516,7 +558,11 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
                             />
                           ))}
                         </div>
-                        <span className="text-xs px-2 py-0.5 bg-secondary rounded-full">
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${
+                          review.type === 'dish'
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-green-500 text-white'
+                        }`}>
                           {review.type === 'restaurant'
                             ? t('review.restaurant')
                             : `${t('review.dish')}: ${targetName}`}

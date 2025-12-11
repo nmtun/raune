@@ -320,7 +320,9 @@
     "deleteSuccess": "レビューが削除されました",
     "deleteConfirmTitle": "削除の確認",
     "deleteConfirmMessage": "このレビューを削除してもよろしいですか？",
-    "confirmDelete": "削除"
+    "confirmDelete": "削除",
+    "loginRequired": "ログインが必要です",
+    "loginRequiredDesc": "レビューを書くにはログインしてください"
   },
   "register": {
     "title": "アカウント登録",

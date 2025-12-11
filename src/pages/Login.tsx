@@ -98,18 +98,52 @@ const Login = () => {
     
     localStorage.setItem('userSession', JSON.stringify(sessionData));
     
-    // Check if this is first login (account created recently)
-    const accountCreatedAt = new Date(account.createdAt).getTime();
-    const isNewAccount = (loginTime - accountCreatedAt) < (7 * 24 * 60 * 60 * 1000); // 7 days
+    // Check if user has completed survey (check localStorage for userFoodPreferences with userId)
+    const storageKey = `userFoodPreferences_${account.id}`;
+    const userFoodPreferences = localStorage.getItem(storageKey);
+    let hasCompletedSurvey = false;
     
-    // Check if user has preferences
-    const hasPreferences = account.prefs && account.prefs.length > 0;
+    if (userFoodPreferences) {
+      try {
+        const prefs = JSON.parse(userFoodPreferences);
+        // Verify this belongs to current user
+        hasCompletedSurvey = prefs.userId === account.id && 
+                            prefs.foodPreferences && 
+                            prefs.foodPreferences.length > 0;
+      } catch (error) {
+        hasCompletedSurvey = false;
+      }
+    }
+    
+    // Migration: Nếu không tìm thấy với key mới, thử key cũ và migrate
+    if (!hasCompletedSurvey) {
+      const oldKey = 'userFoodPreferences';
+      const oldStored = localStorage.getItem(oldKey);
+      if (oldStored) {
+        try {
+          const oldPrefs = JSON.parse(oldStored);
+          // Nếu dữ liệu cũ không có userId hoặc thuộc về user hiện tại, migrate
+          if (!oldPrefs.userId || oldPrefs.userId === account.id) {
+            const migratedPrefs = {
+              ...oldPrefs,
+              userId: account.id
+            };
+            localStorage.setItem(storageKey, JSON.stringify(migratedPrefs));
+            // Xóa key cũ sau khi migrate
+            localStorage.removeItem(oldKey);
+            hasCompletedSurvey = migratedPrefs.foodPreferences && migratedPrefs.foodPreferences.length > 0;
+          }
+        } catch (error) {
+          // Ignore migration errors
+        }
+      }
+    }
     
     setLoading(false);
     
-    // If no preferences or new account -> go to survey
-    if (!hasPreferences || isNewAccount) {
-      // First time login or no preferences - redirect to survey
+    // If no survey results -> go to survey
+    if (!hasCompletedSurvey) {
+      // First time login - redirect to survey
       toast({
         title: t('login.loginSuccessFirstTime'),
         description: t('login.loginSuccessFirstTimeDesc'),
@@ -118,7 +152,7 @@ const Login = () => {
         navigate('/survey');
       }, 1500);
     } else {
-      // Regular login with preferences - redirect to home
+      // Regular login with survey completed - redirect to home
       toast({
         title: t('login.loginSuccess'),
         description: t('login.loginSuccessDesc'),
