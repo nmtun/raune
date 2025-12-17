@@ -14,6 +14,11 @@ import Register from "./pages/Register";
 import Login from "./pages/Login";
 import { initializeAccounts } from "./utils/profileUtils";
 import "./i18n";
+import AdminLayout from "./pages/admin/AdminLayout";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import FoodManagement from "./pages/admin/FoodManagement";
+import ReviewManagement from "./pages/admin/ReviewManagement";
+import RestaurantManagement from "./pages/admin/RestaurantManagement";
 
 // Khởi tạo accounts từ JSON vào localStorage khi app khởi động
 initializeAccounts();
@@ -35,7 +40,12 @@ const App = () => (
           <Route path="/my-reviews" element={<MyReviews />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="review_management" element={<ReviewManagement />} />
+            <Route path="food_management" element={<FoodManagement />} />
+            <Route path="restaurant_management" element={<RestaurantManagement />} />
+          </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

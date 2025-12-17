@@ -394,5 +394,14 @@
       "rating": "Đánh giá"
     },
     "copyright": "© 2025 Raune Launch. Tất cả các quyền được bảo lưu."
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "restaurant": "Nhà hàng",
+    "dish": "Món ăn",
+    "review": "Đánh giá",
+    "management": "Quản lý",
+    "reviewManagement": "Quản lý đánh giá",
+    "sum": "Tổng số"
   }
 }
