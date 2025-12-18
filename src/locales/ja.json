@@ -394,5 +394,14 @@
       "rating": "評価"
     },
     "copyright": "© 2025 Raune Launch. すべての権利を保有。"
+  },
+  "admin": {
+    "dashboard": "ダッシュボード",
+    "restaurant": "レストラン",
+    "dish": "料理",
+    "review": "レビュー",
+    "management": "管理",
+    "reviewManagement": "レビュー管理",
+    "sum": "合計"
   }
 }

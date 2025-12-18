@@ -20,6 +20,7 @@ interface Account {
   prefs?: string[];
   history?: number[];
   createdAt: string;
+  role?: string
 }
 
 const Login = () => {
@@ -85,18 +86,37 @@ const Login = () => {
       return;
     }
     
-    // Store session data (in localStorage for simplicity)
+    // Store session data
     const loginTime = new Date().getTime();
     const sessionData = {
       userId: account.id,
       email: account.email,
       username: account.username,
       profileImage: account.profileImage,
+      role: account.role, // Lưu role vào session
       loginTime,
       expiresAt: loginTime + (30 * 24 * 60 * 60 * 1000), // 30 days
     };
-    
+
     localStorage.setItem('userSession', JSON.stringify(sessionData));
+
+    // KIỂM TRA ROLE ADMIN VÀ CHUYỂN HƯỚNG
+    // ---------------------------------------------------------
+    if (account.role === 'admin') {
+      setLoading(false);
+      toast({
+        title: t('login.loginSuccess'),
+        description: "Welcome Administrator", 
+      });
+      
+      // Chuyển hướng sang trang Admin
+      setTimeout(() => {
+        navigate('/admin'); 
+      }, 1500);
+      
+      // Dừng hàm tại đây, KHÔNG chạy xuống phần kiểm tra survey bên dưới
+      return;
+    }
     
     // Check if user has completed survey (check localStorage for userFoodPreferences with userId)
     const storageKey = `userFoodPreferences_${account.id}`;

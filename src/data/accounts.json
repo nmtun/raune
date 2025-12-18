@@ -46,5 +46,18 @@
     "prefs": [],
     "history": [],
     "createdAt": "2025-11-28T10:00:00Z"
+  },
+  {
+    "id": 999,
+    "username": "Admin",
+    "email": "admin@gmail.com",
+    "password": "Hungkovoduyen_123",
+    "profileImage": "/profile-image/avt3.jpg",
+    "lat": 21.0290,
+    "lng": 105.8360,
+    "prefs": [],
+    "history": [],
+    "createdAt": "2025-11-28T10:00:00Z",
+    "role": "admin"
   }
 ]
