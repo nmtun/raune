@@ -4,7 +4,7 @@ import reviewsData from '@/data/reviews.json';
 const STORAGE_KEY_RESTAURANTS = 'restaurants';
 const STORAGE_KEY_RESTAURANTS_INITIALIZED = 'restaurantsInitialized';
 
-interface Restaurant {
+export interface Restaurant {
   id: number;
   name: string;
   address: string;
@@ -15,6 +15,7 @@ interface Restaurant {
   reviews: number;
   tags: string[];
   photo: string;
+  status: 'active' | 'hidden';
 }
 
 interface Review {
@@ -56,11 +57,11 @@ export const getAllRestaurants = (): Restaurant[] => {
   try {
     // Đảm bảo đã khởi tạo
     initializeRestaurants();
-    
+
     // Get restaurants from localStorage only
     const localRestaurantsStr = localStorage.getItem(STORAGE_KEY_RESTAURANTS);
     const localRestaurants = localRestaurantsStr ? JSON.parse(localRestaurantsStr) : [];
-    
+
     return localRestaurants;
   } catch (error) {
     console.error('Error getting all restaurants:', error);
@@ -79,21 +80,21 @@ const getAllReviews = (): Review[] => {
       // Merge với dữ liệu từ JSON để đảm bảo có đầy đủ reviews
       const jsonReviewsMap = new Map((reviewsData as Review[]).map(r => [r.id, r]));
       const savedReviewsMap = new Map(parsedReviews.map((r: Review) => [r.id, r]));
-      
+
       const mergedReviews = new Map();
-      
+
       // Thêm tất cả reviews từ localStorage (đã được edit)
       savedReviewsMap.forEach((review, id) => {
         mergedReviews.set(id, review);
       });
-      
+
       // Thêm reviews từ JSON nếu chưa có trong localStorage
       jsonReviewsMap.forEach((review, id) => {
         if (!mergedReviews.has(id)) {
           mergedReviews.set(id, review);
         }
       });
-      
+
       return Array.from(mergedReviews.values());
     } else {
       return reviewsData as Review[];
@@ -109,20 +110,20 @@ const getAllReviews = (): Review[] => {
  */
 export const calculateRestaurantStats = (restaurantId: number): { rating: number; reviews: number } => {
   const allReviews = getAllReviews();
-  
+
   // Lọc reviews cho nhà hàng này (chỉ restaurant reviews, không tính dish reviews)
   const restaurantReviews = allReviews.filter(
     (r) => r.type === 'restaurant' && r.targetId === restaurantId
   );
-  
+
   if (restaurantReviews.length === 0) {
     return { rating: 0, reviews: 0 };
   }
-  
+
   // Tính rating trung bình
   const totalRating = restaurantReviews.reduce((sum, r) => sum + r.rating, 0);
   const averageRating = totalRating / restaurantReviews.length;
-  
+
   return {
     rating: Math.round(averageRating * 10) / 10, // Làm tròn 1 chữ số thập phân
     reviews: restaurantReviews.length,
@@ -133,16 +134,29 @@ export const calculateRestaurantStats = (restaurantId: number): { rating: number
  * Lấy restaurant theo ID với rating và reviews được tính thực tế
  */
 export const getRestaurantById = (id: number): Restaurant | null => {
-  const allRestaurants = getAllRestaurants();
+  // Thêm logic kiểm tra LocalStorage trước khi lấy tất cả nhà hàng
+  const STORAGE_KEY = 'admin_restaurants_data';
+  const savedData = localStorage.getItem(STORAGE_KEY);
+
+  let allRestaurants: Restaurant[];
+
+  if (savedData) {
+    // Nếu có dữ liệu trong LocalStorage (do Admin đã sửa), sử dụng dữ liệu này
+    allRestaurants = JSON.parse(savedData);
+  } else {
+    // Nếu không, sử dụng hàm lấy dữ liệu mặc định từ JSON
+    allRestaurants = getAllRestaurants();
+  }
+
   const restaurant = allRestaurants.find((r) => r.id === id);
-  
+
   if (!restaurant) {
     return null;
   }
-  
-  // Tính rating và reviews thực tế
+
+  // Tính rating và reviews thực tế từ hệ thống đánh giá
   const stats = calculateRestaurantStats(id);
-  
+
   return {
     ...restaurant,
     rating: stats.rating,
