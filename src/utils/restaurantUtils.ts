@@ -4,7 +4,7 @@ import reviewsData from '@/data/reviews.json';
 const STORAGE_KEY_RESTAURANTS = 'restaurants';
 const STORAGE_KEY_RESTAURANTS_INITIALIZED = 'restaurantsInitialized';
 
-interface Restaurant {
+export interface Restaurant {
   id: number;
   name: string;
   address: string;
@@ -134,14 +134,27 @@ export const calculateRestaurantStats = (restaurantId: number): { rating: number
  * Lấy restaurant theo ID với rating và reviews được tính thực tế
  */
 export const getRestaurantById = (id: number): Restaurant | null => {
-  const allRestaurants = getAllRestaurants();
+  // Thêm logic kiểm tra LocalStorage trước khi lấy tất cả nhà hàng
+  const STORAGE_KEY = 'admin_restaurants_data';
+  const savedData = localStorage.getItem(STORAGE_KEY);
+
+  let allRestaurants: Restaurant[];
+
+  if (savedData) {
+    // Nếu có dữ liệu trong LocalStorage (do Admin đã sửa), sử dụng dữ liệu này
+    allRestaurants = JSON.parse(savedData);
+  } else {
+    // Nếu không, sử dụng hàm lấy dữ liệu mặc định từ JSON
+    allRestaurants = getAllRestaurants();
+  }
+
   const restaurant = allRestaurants.find((r) => r.id === id);
 
   if (!restaurant) {
     return null;
   }
 
-  // Tính rating và reviews thực tế
+  // Tính rating và reviews thực tế từ hệ thống đánh giá
   const stats = calculateRestaurantStats(id);
 
   return {
