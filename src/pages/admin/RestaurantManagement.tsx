@@ -11,9 +11,11 @@ import { toast } from 'sonner';
 import restaurantsData from '@/data/restaurants.json';
 import menusData from '@/data/menus.json';
 import { Restaurant } from '@/utils/restaurantUtils';
+import { useLanguage } from '@/hooks/useLanguage';
 
 const RestaurantManagement = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const STORAGE_KEY = 'admin_restaurants_data';
 
   // 1. Khởi tạo State từ LocalStorage hoặc JSON gốc
@@ -66,15 +68,16 @@ const RestaurantManagement = () => {
 
     // --- 1. Kiểm tra các trường bắt buộc ---
     const requiredFields = {
-      name: "Tên nhà hàng",
-      address: "Địa chỉ",
-      category: "Danh mục",
-      photo: "Link ảnh"
+      name: t("admin.name"),
+      address: t("admin.address"),
+      category: t("admin.category"),
+      photo: t("admin.photo")
     };
 
     for (const [field, label] of Object.entries(requiredFields)) {
       if (!editingRestaurant[field as keyof Restaurant]?.toString().trim()) {
-        toast.error(`Trường '${label}' là bắt buộc.`);
+        // Sử dụng nội dung dịch cho thông báo lỗi
+        toast.error(t("admin.required_field", { field: label }));
         return;
       }
     }
@@ -84,11 +87,9 @@ const RestaurantManagement = () => {
     const hasValidExtension = /\.(jpg|jpeg|png|webp|avif|svg)/i.test(photoUrl.split('?')[0]);
 
     if (!isUnsplash && !hasValidExtension) {
-      toast.error("Định dạng ảnh không hợp lệ. Vui lòng sử dụng link ảnh (.jpg, .png, .webp) hoặc link từ Unsplash.");
+      toast.error(t("admin.invalid_image"));
       return;
     }
-
-
 
     // --- 3. Kiểm tra trùng lặp (Tên + Địa chỉ) ---
     const isDuplicate = restaurants.some(r =>
@@ -98,7 +99,7 @@ const RestaurantManagement = () => {
     );
 
     if (isDuplicate) {
-      toast.error("Nhà hàng với tên và địa chỉ này đã tồn tại trong hệ thống.");
+      toast.error(t("admin.duplicate_error"));
       return;
     }
 
@@ -106,7 +107,7 @@ const RestaurantManagement = () => {
     if (isEditMode && editingRestaurant.id) {
       // Logic Cập nhật
       setRestaurants(prev => prev.map(r => r.id === editingRestaurant.id ? (editingRestaurant as Restaurant) : r));
-      toast.success("Cập nhật nhà hàng thành công");
+      toast.success(t("admin.updateSuccess"));
     } else {
       // Logic Thêm mới
       const newId = restaurants.length > 0 ? Math.max(...restaurants.map(r => r.id)) + 1 : 1;
@@ -117,7 +118,7 @@ const RestaurantManagement = () => {
         reviews: 0   // Giá trị mặc định
       } as Restaurant;
       setRestaurants(prev => [newRestaurant, ...prev]);
-      toast.success("Thêm nhà hàng mới thành công");
+      toast.success(t("admin.createSuccess"));
     }
 
     setIsDialogOpen(false);
@@ -126,13 +127,13 @@ const RestaurantManagement = () => {
   const handleDelete = (id: number) => {
     const hasMenu = menusData.some(menu => menu.restaurantId === id);
     if (hasMenu) {
-      if (window.confirm("Nhà hàng này có menu. Bạn có muốn chuyển sang trạng thái 'Ẩn' không?")) {
+      if (window.confirm(t("admin.delete_confirm_has_menu"))) {
         setRestaurants(prev => prev.map(r => r.id === id ? { ...r, status: 'hidden' } : r));
       }
     } else {
-      if (window.confirm("Xóa vĩnh viễn nhà hàng này?")) {
+      if (window.confirm(t("admin.deleteDishConfirmMessage"))) {
         setRestaurants(prev => prev.filter(r => r.id !== id));
-        toast.success("Đã xóa thành công");
+        toast.success(t("admin.deleteSuccess"));
       }
     }
   };
@@ -145,16 +146,16 @@ const RestaurantManagement = () => {
   return (
     <div className="p-6 space-y-4">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Quản lý Nhà hàng</h1>
+        <h1 className="text-2xl font-bold">{t("admin.title")}</h1>
         <Button onClick={handleAddClick}>
-          <Plus className="w-4 h-4 mr-2" /> Thêm nhà hàng
+          <Plus className="w-4 h-4 mr-2" /> {t("admin.add_button")}
         </Button>
       </div>
 
       <div className="relative">
         <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="Tìm kiếm..."
+          placeholder={t("admin.search_placeholder")}
           className="pl-10"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -165,30 +166,30 @@ const RestaurantManagement = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableCell>Tên nhà hàng</TableCell>
-              <TableCell>Danh mục</TableCell>
-              <TableCell>Trạng thái</TableCell>
-              <TableCell>Thao tác</TableCell>
+              <TableCell>{t("admin.name")}</TableCell>
+              <TableCell>{t("admin.category")}</TableCell>
+              <TableCell>{t("admin.status")}</TableCell>
+              <TableCell>{t("admin.actions")}</TableCell>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredRestaurants.map((res) => (
               <TableRow key={res.id}>
                 <TableCell className="font-medium">{res.name}</TableCell>
-                <TableCell>{res.category}</TableCell>
+                <TableCell>{t(`categories.${res.category.toLowerCase()}`)}</TableCell>
                 <TableCell>
                   <Badge variant={res.status === 'hidden' ? 'destructive' : 'default'}>
-                    {res.status === 'hidden' ? 'HIDDEN' : 'ACTIVE'}
+                    {res.status === 'hidden' ? t('admin.HIDDEN') : t('admin.ACTIVE')}
                   </Badge>
                 </TableCell>
                 <TableCell className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={() => navigate(`/restaurant/${res.id}`)}>
+                  <Button variant="outline" size="sm" title={t("common.view")} onClick={() => navigate(`/restaurant/${res.id}`)}>
                     <Eye className="w-4 h-4" />
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => handleEditClick(res)}>
+                  <Button variant="outline" size="sm" title={t("common.edit")} onClick={() => handleEditClick(res)}>
                     <Edit className="w-4 h-4" />
                   </Button>
-                  <Button variant="destructive" size="sm" onClick={() => handleDelete(res.id)}>
+                  <Button variant="destructive" size="sm" title={t("common.delete")} onClick={() => handleDelete(res.id)}>
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </TableCell>
@@ -202,13 +203,13 @@ const RestaurantManagement = () => {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>{isEditMode ? 'Sửa thông tin' : 'Thêm nhà hàng mới'}</DialogTitle>
+            <DialogTitle>{isEditMode ? t("admin.edit_title") : t("admin.add_title")}</DialogTitle>
           </DialogHeader>
 
           {editingRestaurant && (
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">Tên</Label>
+                <Label htmlFor="name" className="text-right">{t("admin.name")}</Label>
                 <Input
                   id="name"
                   className="col-span-3"
@@ -217,7 +218,7 @@ const RestaurantManagement = () => {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="address" className="text-right">Địa chỉ</Label>
+                <Label htmlFor="address" className="text-right">{t("admin.address")}</Label>
                 <Input
                   id="address"
                   className="col-span-3"
@@ -226,21 +227,21 @@ const RestaurantManagement = () => {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="category" className="text-right">Danh mục</Label>
+                <Label htmlFor="category" className="text-right">{t("admin.category")}</Label>
                 <select
                   className="col-span-3 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   value={editingRestaurant.category}
                   onChange={(e) => setEditingRestaurant({ ...editingRestaurant, category: e.target.value })}
                 >
-                  <option value="Vietnamese">Vietnamese</option>
-                  <option value="Asian">Asian</option>
-                  <option value="Western">Western</option>
-                  <option value="Cafe">Cafe</option>
-                  <option value="Fast Food">Fast Food</option>
+                  <option value="Vietnamese">{t("categories.vietnamese")}</option>
+                  <option value="Asian">{t("categories.asian")}</option>
+                  <option value="Western">{t("categories.western")}</option>
+                  <option value="Cafe">{t("categories.cafe")}</option>
+                  <option value="Fast Food">{t("categories.fast food")}</option>
                 </select>
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="photo" className="text-right">Link ảnh</Label>
+                <Label htmlFor="photo" className="text-right">{t("admin.photo")}</Label>
                 <Input
                   id="photo"
                   className="col-span-3"
@@ -252,8 +253,8 @@ const RestaurantManagement = () => {
           )}
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Hủy</Button>
-            <Button onClick={handleSave}>Xác nhận</Button>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>{t("admin.Cancel")}</Button>
+            <Button onClick={handleSave}>{t("admin.Update")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

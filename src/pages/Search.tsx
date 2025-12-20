@@ -21,7 +21,7 @@ const Search = () => {
   const navigate = useNavigate();
   const location = useGeolocation();
   const { t } = useLanguage();
-  
+
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'rating');
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
@@ -49,25 +49,25 @@ const Search = () => {
     if (searchQuery) {
       results = results.filter((r) => {
         // Kiểm tra tên nhà hàng, category, address, tags
-        const restaurantMatch = 
+        const restaurantMatch =
           flexibleMatch(r.name, searchQuery) ||
           flexibleMatch(r.category, searchQuery) ||
           flexibleMatch(r.address, searchQuery) ||
           r.tags.some((tag) => flexibleMatch(tag, searchQuery));
-        
+
         // Kiểm tra tên món ăn (cả tiếng Việt và tiếng Nhật)
         const dishMatch = menusData.some((d) => {
           if (d.restaurantId !== r.id) return false;
-          
-          const dishNameMatch = typeof d.name === 'string' 
+
+          const dishNameMatch = typeof d.name === 'string'
             ? flexibleMatch(d.name, searchQuery)
-            : (flexibleMatch(d.name.vi, searchQuery) || 
+            : (flexibleMatch(d.name.vi, searchQuery) ||
                flexibleMatch(d.name.ja, searchQuery) ||
                d.name.ja.includes(searchQuery));
-          
+
           return dishNameMatch || flexibleMatch(d.category, searchQuery);
         });
-        
+
         return restaurantMatch || dishMatch;
       });
     }
@@ -80,20 +80,20 @@ const Search = () => {
     // Calculate distances and attach featured dishes
     const withDistance = results.map((r) => {
       const distance = calculateDistance(location.lat, location.lng, r.lat, r.lng);
-      
+
       // Get dishes for this restaurant
       let dishes = menusData.filter((d) => d.restaurantId === r.id);
-      
+
       // Filter dishes by search query if exists (with flexible matching)
       if (searchQuery) {
         const matchingDishes = dishes.filter((d) => {
           // Kiểm tra tên món ăn (hỗ trợ cả tiếng Việt và tiếng Nhật)
-          const dishNameMatch = typeof d.name === 'string' 
+          const dishNameMatch = typeof d.name === 'string'
             ? flexibleMatch(d.name, searchQuery)
-            : (flexibleMatch(d.name.vi, searchQuery) || 
+            : (flexibleMatch(d.name.vi, searchQuery) ||
                flexibleMatch(d.name.ja, searchQuery) ||
                d.name.ja.includes(searchQuery)); // Thêm tìm kiếm trực tiếp cho tiếng Nhật
-          
+
           return dishNameMatch || flexibleMatch(d.category, searchQuery);
         });
         // If there are matching dishes, show them; otherwise show top 3 dishes
@@ -102,7 +102,7 @@ const Search = () => {
         // Show top 3 highest rated dishes
         dishes = dishes.sort((a, b) => b.rating - a.rating).slice(0, 3);
       }
-      
+
       return {
         ...r,
         distance,
@@ -152,7 +152,7 @@ const Search = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header 
+      <Header
         location={location.isFallback ? t('location.defaultLocation') : t('location.yourLocation')}
         onRefreshLocation={handleRefreshLocation}
         isLoadingLocation={location.loading}
@@ -246,7 +246,7 @@ const Search = () => {
                       category === 'All'
                         ? selectedCategories.length === 0
                         : selectedCategories.includes(category);
-                    
+
                     const getCategoryName = (cat: string) => {
                       switch(cat) {
                         case 'All': return t('categories.all');
@@ -258,7 +258,7 @@ const Search = () => {
                         default: return cat;
                       }
                     };
-                    
+
                     return (
                       <button
                         key={category}
