@@ -52,12 +52,32 @@
     "searchFor": "検索: \"{{query}}\"",
     "noResults": "レストランが見つかりませんでした。",
     "clearFilters": "フィルターをクリア",
-    "searchTip": "💡 ヒント: 検索では大文字小文字を区別しません - \"pho\"でも「フォー」が見つかります"
+    "searchTip": "💡 ヒント: 検索では大文字小文字を区別しません - \"pho\"でも「フォー」が見つかります",
+    "searchDishes": "料理名で検索..."
+  },
+  "filter": {
+    "allCategories": "すべてのカテゴリー",
+    "vietnamese": "ベトナム料理",
+    "japanese": "日本料理",
+    "korean": "韓国料理",
+    "chinese": "中華料理",
+    "western": "西洋料理",
+    "asian": "アジア料理",
+    "fastFood": "ファストフード",
+    "cafe": "カフェ",
+    "selectCategory": "カテゴリーを選択"
   },
   "sort": {
     "rating": "評価の高い順",
     "distance": "最も近い順",
-    "reviews": "レビュー数順"
+    "reviews": "レビュー数順",
+    "name": "名前: A-Z",
+    "priceHighToLow": "価格: 高い順",
+    "priceLowToHigh": "価格: 安い順",
+    "ratingHighToLow": "評価: 高い順",
+    "ratingLowToHigh": "評価: 低い順",
+    "popular": "人気順",
+    "sortBy": "並び替え"
   },
   "distance": {
     "within3km": "3km以内",
@@ -402,6 +422,32 @@
     "review": "レビュー",
     "management": "管理",
     "reviewManagement": "レビュー管理",
-    "sum": "合計"
+    "sum": "合計",
+    "dishManagement": "料理管理",
+    "searchByName": "名前で料理を検索...",
+    "Add new dish": "新しい料理を追加",
+    "Edit dish": "料理を編集",
+    "Fill all fields": "すべての必須フィールドに入力してください。*印のあるフィールドは必須です。",
+    "Dish name (Vietnamese)": "料理名（ベトナム語）",
+    "Dish name (Japanese)": "料理名（日本語）",
+    "Restaurant": "レストラン",
+    "Category": "カテゴリー",
+    "Price": "価格",
+    "Image": "画像",
+    "Description about dish": "料理の説明",
+    "createSuccess": "料理の追加に成功しました",
+    "updateSuccess": "更新に成功しました",
+    "deleteSuccess": "削除に成功しました",
+    "dataError": "データエラー",
+    "dataErrorDesc": "料理データが無効です。デフォルトデータを読み込みました。",
+    "parseError": "データ読み込みエラー",
+    "parseErrorDesc": "料理データを読み込めませんでした。デフォルトデータを読み込みました。",
+    "error": "エラー",
+    "noDishSelected": "料理が選択されていません",
+    "Update": "更新",
+    "Cancel": "キャンセル",
+    "deleteDishConfirmTitle": "料理の削除確認",
+    "deleteDishConfirmMessage": "この料理を削除してもよろしいですか？",
+    "deleteDishConfirmWarning": "この操作は元に戻せません！"
   }
 }
