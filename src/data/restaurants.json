@@ -6,6 +6,7 @@
     "lat": 21.0278,
     "lng": 105.8342,
     "category": "Vietnamese",
+    "status": "hidden",
     "rating": 4.5,
     "reviews": 234,
     "tags": [
@@ -27,6 +28,7 @@
       "Famous",
       "Takeaway"
     ],
+    "status": "hidden",
     "photo": "https://images.unsplash.com/photo-1559314809-0d155014e29e?w=400&h=300&fit=crop"
   },
   {
@@ -42,6 +44,7 @@
       "Wifi",
       "Delivery"
     ],
+    "status": "hidden",
     "photo": "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=400&h=300&fit=crop"
   },
   {
@@ -57,6 +60,7 @@
       "Western",
       "Outdoor"
     ],
+    "status": "hidden",
     "photo": "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&h=300&fit=crop"
   },
   {
@@ -72,6 +76,7 @@
       "Hotpot",
       "Delivery"
     ],
+    "status": "hidden",
     "photo": "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=400&h=300&fit=crop"
   },
   {
@@ -87,6 +92,7 @@
       "Street Food",
       "Quick"
     ],
+    "status": "active",
     "photo": "https://cdn2.fptshop.com.vn/unsafe/1920x0/filters:format(webp):quality(75)/banh_mi_man_3051eb6d27.jpg"
   },
   {
@@ -102,6 +108,7 @@
       "Fast Food",
       "Delivery"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1561758033-d89a9ad46330?w=400&h=300&fit=crop"
   },
   {
@@ -117,6 +124,7 @@
       "Traditional",
       "Outdoor"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=400&h=300&fit=crop"
   },
   {
@@ -132,6 +140,7 @@
       "BBQ",
       "Buffet"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1590301157890-4810ed352733?w=400&h=300&fit=crop"
   },
   {
@@ -147,6 +156,7 @@
       "Bubble Tea",
       "Takeaway"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1525385133512-2f3bdd039054?w=400&h=300&fit=crop"
   },
   {
@@ -162,6 +172,7 @@
       "Korean BBQ",
       "Delivery"
     ],
+    "status": "active",
     "photo": "https://toplist.vn/images/800px/gogi-house-1364825.jpg"
   },
   {
@@ -177,6 +188,7 @@
       "Traditional",
       "Spicy"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1548340748-6d2b7d7da280?w=400&h=300&fit=crop"
   },
   {
@@ -192,6 +204,7 @@
       "Family",
       "Delivery"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1562967914-608f82629710?w=400&h=300&fit=crop"
   },
   {
@@ -207,6 +220,7 @@
       "Unique",
       "Wifi"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=400&h=300&fit=crop"
   },
   {
@@ -222,6 +236,7 @@
       "Famous",
       "Traditional"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=400&h=300&fit=crop"
   },
   {
@@ -237,6 +252,7 @@
       "Fast Food",
       "Delivery"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=400&h=300&fit=crop"
   },
   {
@@ -252,6 +268,7 @@
       "Breakfast",
       "Quick"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1609501676725-7186f017a4b7?w=400&h=300&fit=crop"
   },
   {
@@ -267,6 +284,7 @@
       "Japanese",
       "Premium"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400&h=300&fit=crop"
   },
   {
@@ -282,6 +300,7 @@
       "Fast Food",
       "Delivery"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1550547660-d9450f859349?w=400&h=300&fit=crop"
   },
   {
@@ -297,6 +316,7 @@
       "Famous",
       "Traditional"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1591814468924-caf88d1232e1?w=400&h=300&fit=crop"
   },
   {
@@ -312,6 +332,7 @@
       "Traditional",
       "Authentic"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1569562211093-4ed0d0758f12?w=400&h=300&fit=crop"
   },
   {
@@ -327,6 +348,7 @@
       "Wifi",
       "Study Space"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1559305616-3f99cd43e353?w=400&h=300&fit=crop"
   },
   {
@@ -342,6 +364,7 @@
       "Beef",
       "Specialty"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&fit=crop"
   },
   {
@@ -357,6 +380,7 @@
       "Pizza",
       "Delivery"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=300&fit=crop"
   },
   {
@@ -372,6 +396,7 @@
       "Specialty",
       "Traditional"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1569562211093-4ed0d0758f12?w=400&h=300&fit=crop"
   },
   {
@@ -387,6 +412,7 @@
       "Hotpot",
       "Group Dining"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=400&h=300&fit=crop"
   },
   {
@@ -402,6 +428,7 @@
       "Breakfast",
       "Traditional"
     ],
+    "status": "active",
     "photo": "https://media-cdn-v2.laodong.vn/Storage/NewsPortal/2022/11/4/1112805/Banh-Cuon-Phuong.jpg"
   },
   {
@@ -417,6 +444,7 @@
       "Fast Food",
       "24/7"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=400&h=300&fit=crop"
   },
   {
@@ -432,6 +460,7 @@
       "Grilled",
       "Southern"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop"
   },
   {
@@ -447,6 +476,7 @@
       "Japanese",
       "Ramen"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1557872943-16a5ac26437e?w=400&h=300&fit=crop"
   },
   {
@@ -462,6 +492,7 @@
       "Vietnamese Coffee",
       "Wifi"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=300&fit=crop"
   },
   {
@@ -477,6 +508,7 @@
       "Traditional",
       "Soup"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1569562211093-4ed0d0758f12?w=400&h=300&fit=crop"
   },
   {
@@ -492,6 +524,7 @@
       "Italian",
       "Romantic"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=400&h=300&fit=crop"
   },
   {
@@ -507,6 +540,7 @@
       "Rice",
       "Southern"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=400&h=300&fit=crop"
   },
   {
@@ -522,6 +556,7 @@
       "Hotpot",
       "Beef"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=400&h=300&fit=crop"
   },
   {
@@ -537,6 +572,7 @@
       "Chicken",
       "American"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=400&h=300&fit=crop"
   },
   {
@@ -552,6 +588,7 @@
       "Chinese",
       "Dimsum"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=400&h=300&fit=crop"
   },
   {
@@ -567,6 +604,7 @@
       "Specialty",
       "Hanoi Style"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=400&h=300&fit=crop"
   },
   {
@@ -582,6 +620,7 @@
       "Dessert",
       "Bakery"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&h=300&fit=crop"
   },
   {
@@ -597,6 +636,7 @@
       "Snail",
       "Traditional"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1569562211093-4ed0d0758f12?w=400&h=300&fit=crop"
   },
   {
@@ -612,6 +652,7 @@
       "Chicken",
       "Fast Food"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=400&h=300&fit=crop"
   },
   {
@@ -627,6 +668,7 @@
       "Specialty",
       "Lake View"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1559314809-0d155014e29e?w=400&h=300&fit=crop"
   },
   {
@@ -642,6 +684,7 @@
       "Japanese BBQ",
       "Premium"
     ],
+    "status": "active",
     "photo": "https://delishglobe.com/wp-content/uploads/2024/10/Yakiniku.png"
   },
   {
@@ -657,6 +700,7 @@
       "Dessert",
       "Sweet"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=400&h=300&fit=crop"
   },
   {
@@ -672,6 +716,7 @@
       "Healthy",
       "Sandwich"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=300&fit=crop"
   },
   {
@@ -687,6 +732,7 @@
       "Breakfast",
       "Beef"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=300&fit=crop"
   },
   {
@@ -702,6 +748,7 @@
       "Japanese",
       "Buffet"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400&h=300&fit=crop"
   },
   {
@@ -717,6 +764,7 @@
       "Egg Coffee",
       "Famous"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1511920170033-f8396924c348?w=400&h=300&fit=crop"
   },
   {
@@ -732,6 +780,7 @@
       "Thai",
       "Hotpot"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=400&h=300&fit=crop"
   },
   {
@@ -747,6 +796,7 @@
       "Street Food",
       "Quick"
     ],
+    "status": "active",
     "photo": "https://media.vov.vn/sites/default/files/styles/large/public/2024-12/cach_an_banh_mi_1.jpg"
   },
   {
@@ -762,6 +812,7 @@
       "Japanese",
       "Authentic"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400&h=300&fit=crop"
   },
   {
@@ -778,6 +829,7 @@
       "Premium",
       "Sushi"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400&h=300&fit=crop"
   },
   {
@@ -794,6 +846,7 @@
       "Ramen",
       "Noodles"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1557872943-16a5ac26437e?w=400&h=300&fit=crop"
   },
   {
@@ -809,6 +862,7 @@
       "Japanese",
       "Tempura"
     ],
+    "status": "active",
     "photo": "https://i.pinimg.com/1200x/6b/6d/a7/6b6da7e6c7c3b37bc4dc6e73bc89efe6.jpg"
   },
   {
@@ -825,6 +879,7 @@
       "BBQ",
       "Izakaya"
     ],
+    "status": "active",
     "photo": "https://i.pinimg.com/1200x/5a/56/0c/5a560c1a6ba954c07dd4ad4ba70c3010.jpg"
   },
   {
@@ -841,6 +896,7 @@
       "Udon",
       "Noodles"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1618841557871-b4664fbf0cb3?w=400&h=300&fit=crop"
   },
   {
@@ -857,6 +913,7 @@
       "Tonkatsu",
       "Pork"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=400&h=300&fit=crop"
   },
   {
@@ -872,6 +929,7 @@
       "Japanese",
       "Okonomiyaki"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1626804475297-41608ea09aeb?w=400&h=300&fit=crop"
   },
   {
@@ -888,6 +946,7 @@
       "Matcha",
       "Dessert"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1515823064-d6e0c04616a7?w=400&h=300&fit=crop"
   },
   {
@@ -904,6 +963,7 @@
       "Seafood",
       "Donburi"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400&h=300&fit=crop"
   },
   {
@@ -920,6 +980,7 @@
       "Soba",
       "Noodles"
     ],
+    "status": "active",
     "photo": "https://i.pinimg.com/1200x/58/63/23/586323a9feaafbe55fe118f830ff073a.jpg"
   },
   {
@@ -936,6 +997,7 @@
       "Izakaya",
       "Bar"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=300&fit=crop"
   },
   {
@@ -952,6 +1014,7 @@
       "Takoyaki",
       "Street Food"
     ],
+    "status": "active",
     "photo": "https://i.pinimg.com/736x/81/98/31/8198310aa352bc89447553406f12fd64.jpg"
   },
   {
@@ -967,6 +1030,7 @@
       "Japanese",
       "Curry"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=400&h=300&fit=crop"
   },
   {
@@ -983,6 +1047,7 @@
       "Dessert",
       "Traditional"
     ],
+    "status": "active",
     "photo": "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=400&h=300&fit=crop"
   }
 ]
