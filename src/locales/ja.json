@@ -448,6 +448,23 @@
     "Cancel": "キャンセル",
     "deleteDishConfirmTitle": "料理の削除確認",
     "deleteDishConfirmMessage": "この料理を削除してもよろしいですか？",
-    "deleteDishConfirmWarning": "この操作は元に戻せません！"
+    "deleteDishConfirmWarning": "この操作は元に戻せません！",
+    "title": "レストラン管理",
+    "add_button": "レストランを追加",
+    "name": "店名",
+    "category": "カテゴリー",
+    "status": "状態",
+    "actions": "操作",
+    "search_placeholder": "検索...",
+    "add_title": "新規レストラン登録",
+    "edit_title": "レストラン情報の編集",
+    "address": "住所",
+    "photo": "写真リンク",
+    "HIDDEN": "非表示",
+    "ACTIVE": "有効",
+    "required_field": "「{{field}}」は必須項目です。",
+    "invalid_image": "画像形式が無効です。Unsplashのリンク、または .jpg, .png, .webp 形式を使用してください。",
+    "duplicate_error": "この店名と住所の組み合わせは既に登録されています。",
+    "delete_confirm_has_menu": "このレストランにはメニューが登録されています。削除せずに「非表示」に変更しますか？"
   }
 }
