@@ -52,12 +52,32 @@
     "searchFor": "Tìm kiếm: \"{{query}}\"",
     "noResults": "Không tìm thấy nhà hàng nào.",
     "clearFilters": "Thử xóa bộ lọc",
-    "searchTip": "💡 Mẹo: Tìm kiếm không phân biệt dấu - \"pho\" cũng tìm được \"Phở\", \"ba dinh\" tìm được \"Ba Đình\""
+    "searchTip": "💡 Mẹo: Tìm kiếm không phân biệt dấu - \"pho\" cũng tìm được \"Phở\", \"ba dinh\" tìm được \"Ba Đình\"",
+    "searchDishes": "Tìm kiếm món ăn theo tên..."
+  },
+  "filter": {
+    "allCategories": "Tất cả danh mục",
+    "vietnamese": "Món Việt",
+    "japanese": "Món Nhật",
+    "korean": "Món Hàn",
+    "chinese": "Món Trung",
+    "western": "Món Âu",
+    "asian": "Món Á",
+    "fastFood": "Fast Food",
+    "cafe": "Cafe",
+    "selectCategory": "Chọn danh mục"
   },
   "sort": {
     "rating": "Đánh giá cao nhất",
     "distance": "Gần nhất",
-    "reviews": "Nhiều đánh giá nhất"
+    "reviews": "Nhiều đánh giá nhất",
+    "name": "Tên: A-Z",
+    "priceHighToLow": "Giá: Cao đến Thấp",
+    "priceLowToHigh": "Giá: Thấp đến Cao",
+    "ratingHighToLow": "Đánh giá: Cao đến Thấp",
+    "ratingLowToHigh": "Đánh giá: Thấp đến Cao",
+    "popular": "Phổ biến nhất",
+    "sortBy": "Sắp xếp theo"
   },
   "distance": {
     "within3km": "Trong vòng 3 km",
@@ -402,6 +422,32 @@
     "review": "Đánh giá",
     "management": "Quản lý",
     "reviewManagement": "Quản lý đánh giá",
-    "sum": "Tổng số"
+    "sum": "Tổng số",
+    "dishManagement": "Quản lý món ăn",
+    "searchByName": "tìm kiếm món ăn theo tên...",
+    "Add new dish": "Thêm món ăn mới",
+    "Edit dish": "Chỉnh sửa món ăn",
+    "Fill all fields": "Điền đầy đủ thông tin món ăn. Các trường có dấu * là bắt buộc.",
+    "Dish name (Vietnamese)": "Tên món ăn (Tiếng Việt)",
+    "Dish name (Japanese)": "Tên món ăn (Tiếng Nhật)",
+    "Restaurant": "Nhà hàng",
+    "Category": "Danh mục",
+    "Price": "Giá",
+    "Image": "Hình ảnh",
+    "Description about dish": "Mô tả món ăn",
+    "Update": "Cập nhật",
+    "createSuccess": "Thêm món ăn thành công",
+    "updateSuccess": "Món ăn đã được cập nhật",
+    "deleteSuccess": "Món ăn đã được xóa khỏi danh sách",
+    "dataError": "Lỗi dữ liệu",
+    "dataErrorDesc": "Dữ liệu món ăn không hợp lệ. Đã tải dữ liệu mặc định.",
+    "parseError": "Lỗi đọc dữ liệu",
+    "parseErrorDesc": "Không thể đọc dữ liệu món ăn. Đã tải dữ liệu mặc định.",
+    "error": "Lỗi",
+    "noDishSelected": "Không có món ăn nào được chọn",
+    "cancel": "Hủy",
+    "deleteDishConfirmTitle": "Xác nhận xóa món ăn",
+    "deleteDishConfirmMessage": "Bạn có chắc muốn xóa món ăn này không? ",
+    "deleteDishConfirmWarning": "Hành động này không thể hoàn tác!"
   }
 }

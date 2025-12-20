@@ -30,7 +30,12 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
+      <BrowserRouter
+        future={{
+          v7_startTransition: true, // Wrap state updates trong React.startTransition
+          v7_relativeSplatPath: true, // Opt-in cho v7 relative splat path resolution
+        }}
+      >
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/search" element={<Search />} />
@@ -44,7 +49,10 @@ const App = () => (
             <Route index element={<AdminDashboard />} />
             <Route path="review_management" element={<ReviewManagement />} />
             <Route path="food_management" element={<FoodManagement />} />
-            <Route path="restaurant_management" element={<RestaurantManagement />} />
+            <Route
+              path="restaurant_management"
+              element={<RestaurantManagement />}
+            />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
