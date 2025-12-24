@@ -1,10 +1,15 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useState, useEffect, useMemo, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,27 +19,40 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from "@/components/ui/alert-dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { useLanguage } from '@/hooks/useLanguage';
-import { Star, Pencil, Trash2, MessageSquare, Search, UtensilsCrossed } from 'lucide-react';
-import { toast } from 'sonner';
-import reviewsData from '@/data/reviews.json';
-import menusData from '@/data/menus.json';
-import { getCurrentAccountFromSession, getAllAccounts } from '@/utils/profileUtils';
-import { filterDeletedReviews, addDeletedReviewId } from '@/utils/reviewStorage';
+} from "@/components/ui/select";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useLanguage } from "@/hooks/useLanguage";
+import {
+  Star,
+  Pencil,
+  Trash2,
+  MessageSquare,
+  Search,
+  UtensilsCrossed,
+} from "lucide-react";
+import { toast } from "sonner";
+import reviewsData from "@/data/reviews.json";
+import menusDataDefault from "@/data/menus.json";
+import {
+  getCurrentAccountFromSession,
+  getAllAccounts,
+} from "@/utils/profileUtils";
+import {
+  filterDeletedReviews,
+  addDeletedReviewId,
+} from "@/utils/reviewStorage";
 
 interface Review {
   id: number;
   userId: number;
-  type: 'restaurant' | 'dish';
+  type: "restaurant" | "dish";
   targetId: number;
   rating: number;
   comment: string;
@@ -49,41 +67,67 @@ interface ReviewSectionProps {
 }
 
 const RATING_LABELS = {
-  vi: ['Rất tệ', 'Không ngon', 'Bình thường', 'Ngon', 'Rất ngon'],
-  ja: ['最悪', '美味しくない', '普通', '美味しい', 'とても美味しい'],
+  vi: ["Rất tệ", "Không ngon", "Bình thường", "Ngon", "Rất ngon"],
+  ja: ["最悪", "美味しくない", "普通", "美味しい", "とても美味しい"],
 };
 
-export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionProps) {
+export function ReviewSection({
+  restaurantId,
+  restaurantName,
+}: ReviewSectionProps) {
   const { t, language } = useLanguage();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
-  const [reviewType, setReviewType] = useState<'restaurant' | 'dish'>('restaurant');
+  const [reviewType, setReviewType] = useState<"restaurant" | "dish">(
+    "restaurant"
+  );
   const [selectedDishId, setSelectedDishId] = useState<number | null>(null);
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
-  const [comment, setComment] = useState('');
-  const [filterRating, setFilterRating] = useState<string>('all');
-  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
-  const [dishSearchQuery, setDishSearchQuery] = useState('');
+  const [comment, setComment] = useState("");
+  const [filterRating, setFilterRating] = useState<string>("all");
+  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
+  const [dishSearchQuery, setDishSearchQuery] = useState("");
+  const [menusData, setMenusData] = useState<any[]>([]);
 
   // Get current user from session
   const session = getCurrentAccountFromSession();
   const currentUserId = session?.userId || -1;
 
+  // Load dishes from localStorage or use default data
+  useEffect(() => {
+    const savedDishes = localStorage.getItem("dishes");
+    if (savedDishes) {
+      try {
+        const parsed = JSON.parse(savedDishes);
+        if (Array.isArray(parsed)) {
+          setMenusData(parsed);
+        } else {
+          setMenusData(menusDataDefault);
+        }
+      } catch (error) {
+        console.error("Error parsing dishes:", error);
+        setMenusData(menusDataDefault);
+      }
+    } else {
+      setMenusData(menusDataDefault);
+    }
+  }, []);
+
   // Get restaurant dishes (memoized to prevent unnecessary re-renders)
   const restaurantDishes = useMemo(
     () => menusData.filter((m) => m.restaurantId === restaurantId),
-    [restaurantId]
+    [restaurantId, menusData]
   );
-  
+
   // Track dish IDs for filtering
   const dishIds = useMemo(
     () => new Set(restaurantDishes.map((d) => d.id)),
     [restaurantDishes]
   );
-  
+
   // Use ref to track if we're initializing to prevent save loop
   const isInitializing = useRef(true);
 
@@ -107,57 +151,61 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
   // Load reviews from localStorage or JSON
   useEffect(() => {
     isInitializing.current = true;
-    
+
     // Try to load from localStorage first
-    const savedReviews = localStorage.getItem('reviews');
+    const savedReviews = localStorage.getItem("reviews");
     let allReviews: Review[] = [];
-    
+
     if (savedReviews) {
       try {
         const parsedReviews = JSON.parse(savedReviews);
         // Merge với dữ liệu từ JSON để đảm bảo có đầy đủ reviews
         // Tạo map từ JSON để merge
-        const jsonReviewsMap = new Map((reviewsData as Review[]).map(r => [r.id, r]));
-        const savedReviewsMap = new Map(parsedReviews.map((r: Review) => [r.id, r]));
-        
+        const jsonReviewsMap = new Map(
+          (reviewsData as Review[]).map((r) => [r.id, r])
+        );
+        const savedReviewsMap = new Map(
+          parsedReviews.map((r: Review) => [r.id, r])
+        );
+
         // Merge: ưu tiên reviews từ localStorage (có thể đã được edit), nhưng thêm reviews mới từ JSON
         const mergedReviews = new Map();
-        
+
         // Thêm tất cả reviews từ localStorage (đã được edit)
         savedReviewsMap.forEach((review, id) => {
           mergedReviews.set(id, review);
         });
-        
+
         // Thêm reviews từ JSON nếu chưa có trong localStorage
         jsonReviewsMap.forEach((review, id) => {
           if (!mergedReviews.has(id)) {
             mergedReviews.set(id, review);
           }
         });
-        
+
         allReviews = Array.from(mergedReviews.values());
       } catch (error) {
-        console.error('Error parsing saved reviews:', error);
+        console.error("Error parsing saved reviews:", error);
         allReviews = reviewsData as Review[];
       }
     } else {
       // First time, load from JSON file
       allReviews = reviewsData as Review[];
-      localStorage.setItem('reviews', JSON.stringify(allReviews));
+      localStorage.setItem("reviews", JSON.stringify(allReviews));
     }
-    
+
     // Filter out deleted reviews
     allReviews = filterDeletedReviews(allReviews);
-    
+
     // Filter reviews for this restaurant
     const restaurantReviews = allReviews.filter(
-      (r) => r.type === 'restaurant' && r.targetId === restaurantId
+      (r) => r.type === "restaurant" && r.targetId === restaurantId
     );
     const dishReviews = allReviews.filter(
-      (r) => r.type === 'dish' && dishIds.has(r.targetId)
+      (r) => r.type === "dish" && dishIds.has(r.targetId)
     );
     setReviews([...restaurantReviews, ...dishReviews]);
-    
+
     // Mark initialization as complete after a short delay
     setTimeout(() => {
       isInitializing.current = false;
@@ -170,12 +218,12 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
     if (isInitializing.current) {
       return;
     }
-    
+
     if (reviews.length >= 0) {
       // Get all reviews from localStorage
-      const savedReviews = localStorage.getItem('reviews');
+      const savedReviews = localStorage.getItem("reviews");
       let allReviews: Review[] = [];
-      
+
       if (savedReviews) {
         try {
           allReviews = JSON.parse(savedReviews);
@@ -185,77 +233,87 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
       } else {
         allReviews = reviewsData as Review[];
       }
-      
+
       // Remove old reviews for this restaurant
       allReviews = allReviews.filter(
-        (r) => !(
-          (r.type === 'restaurant' && r.targetId === restaurantId) ||
-          (r.type === 'dish' && dishIds.has(r.targetId))
-        )
+        (r) =>
+          !(
+            (r.type === "restaurant" && r.targetId === restaurantId) ||
+            (r.type === "dish" && dishIds.has(r.targetId))
+          )
       );
-      
+
       // Add current reviews
       allReviews = [...allReviews, ...reviews];
-      
+
       // Save back to localStorage
-      localStorage.setItem('reviews', JSON.stringify(allReviews));
+      localStorage.setItem("reviews", JSON.stringify(allReviews));
     }
   }, [reviews, restaurantId, dishIds]);
 
   // Filter and sort reviews
   const filteredReviews = reviews
     .filter((review) => {
-      if (filterRating === 'all') return true;
-      if (filterRating === '5') return review.rating === 5;
-      if (filterRating === 'low') return review.rating <= 2;
+      if (filterRating === "all") return true;
+      if (filterRating === "5") return review.rating === 5;
+      if (filterRating === "low") return review.rating <= 2;
       return true;
     })
     .sort((a, b) => {
       const dateA = new Date(a.createdAt).getTime();
       const dateB = new Date(b.createdAt).getTime();
-      return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+      return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
     });
 
   // Check if user already reviewed
   const hasReviewedRestaurant = reviews.some(
-    (r) => r.userId === currentUserId && r.type === 'restaurant' && r.targetId === restaurantId
+    (r) =>
+      r.userId === currentUserId &&
+      r.type === "restaurant" &&
+      r.targetId === restaurantId
   );
 
   const hasReviewedDish = (dishId: number) => {
     return reviews.some(
-      (r) => r.userId === currentUserId && r.type === 'dish' && r.targetId === dishId
+      (r) =>
+        r.userId === currentUserId && r.type === "dish" && r.targetId === dishId
     );
   };
 
   // Get dish name
   const getDishName = (dishId: number) => {
     const dish = menusData.find((m) => m.id === dishId);
-    if (!dish) return '';
-    if (typeof dish.name === 'string') return dish.name;
+    if (!dish) return "";
+    if (typeof dish.name === "string") return dish.name;
     return dish.name[language as keyof typeof dish.name] || dish.name.vi;
   };
 
   // Open create dialog
-  const handleOpenCreateDialog = (type?: 'restaurant' | 'dish', dishId?: number) => {
+  const handleOpenCreateDialog = (
+    type?: "restaurant" | "dish",
+    dishId?: number
+  ) => {
     // Check if user is logged in
     if (currentUserId === -1) {
-      toast.error(`${t('review.loginRequired')}: ${t('review.loginRequiredDesc')}`);
+      toast.error(
+        `${t("review.loginRequired")}: ${t("review.loginRequiredDesc")}`
+      );
       return;
     }
-    
-    setReviewType(type || 'restaurant');
+
+    setReviewType(type || "restaurant");
     setSelectedDishId(dishId || null);
     setSelectedReview(null);
     setRating(0);
-    setComment('');
-    setDishSearchQuery('');
+    setComment("");
+    setDishSearchQuery("");
     setIsDialogOpen(true);
   };
 
   // Handle dish selection in dialog
   const handleSelectDish = (dishId: number) => {
     if (hasReviewedDish(dishId)) {
-      toast.error(t('review.alreadyReviewed'));
+      toast.error(t("review.alreadyReviewed"));
       return;
     }
     setSelectedDishId(dishId);
@@ -265,7 +323,7 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
   const handleOpenEditDialog = (review: Review) => {
     setSelectedReview(review);
     setReviewType(review.type);
-    setSelectedDishId(review.type === 'dish' ? review.targetId : null);
+    setSelectedDishId(review.type === "dish" ? review.targetId : null);
     setRating(review.rating);
     setComment(review.comment);
     setIsDialogOpen(true);
@@ -274,30 +332,34 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
   // Submit review
   const handleSubmit = () => {
     if (rating === 0) {
-      toast.error(t('review.pleaseSelectRating'));
+      toast.error(t("review.pleaseSelectRating"));
       return;
     }
     if (!comment.trim()) {
-      toast.error(t('review.pleaseEnterComment'));
+      toast.error(t("review.pleaseEnterComment"));
       return;
     }
     if (comment.length > 300) {
-      toast.error(t('review.commentTooLong'));
+      toast.error(t("review.commentTooLong"));
       return;
     }
 
     // Validation for new review
     if (!selectedReview) {
-      if (reviewType === 'restaurant' && hasReviewedRestaurant) {
-        toast.error(t('review.alreadyReviewed'));
+      if (reviewType === "restaurant" && hasReviewedRestaurant) {
+        toast.error(t("review.alreadyReviewed"));
         return;
       }
-      if (reviewType === 'dish' && !selectedDishId) {
-        toast.error(t('review.pleaseSelectDish'));
+      if (reviewType === "dish" && !selectedDishId) {
+        toast.error(t("review.pleaseSelectDish"));
         return;
       }
-      if (reviewType === 'dish' && selectedDishId && hasReviewedDish(selectedDishId)) {
-        toast.error(t('review.alreadyReviewed'));
+      if (
+        reviewType === "dish" &&
+        selectedDishId &&
+        hasReviewedDish(selectedDishId)
+      ) {
+        toast.error(t("review.alreadyReviewed"));
         return;
       }
     }
@@ -316,27 +378,41 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
           : r
       );
       setReviews(updatedReviews);
-      toast.success(t('review.updateSuccess'));
+
+      // Update dish rating if this is a dish review
+      if (selectedReview.type === "dish") {
+        setTimeout(
+          () => updateDishRatingInStorage(selectedReview.targetId),
+          100
+        );
+      }
+
+      toast.success(t("review.updateSuccess"));
     } else {
       // Create - get max ID from all reviews in localStorage to avoid conflicts
-      const savedReviews = localStorage.getItem('reviews');
+      const savedReviews = localStorage.getItem("reviews");
       let maxId = 0;
       if (savedReviews) {
         try {
           const allReviews = JSON.parse(savedReviews);
-          maxId = allReviews.length > 0 ? Math.max(...allReviews.map((r: Review) => r.id), 0) : 0;
+          maxId =
+            allReviews.length > 0
+              ? Math.max(...allReviews.map((r: Review) => r.id), 0)
+              : 0;
         } catch (error) {
-          maxId = reviews.length > 0 ? Math.max(...reviews.map((r) => r.id), 0) : 0;
+          maxId =
+            reviews.length > 0 ? Math.max(...reviews.map((r) => r.id), 0) : 0;
         }
       } else {
-        maxId = reviews.length > 0 ? Math.max(...reviews.map((r) => r.id), 0) : 0;
+        maxId =
+          reviews.length > 0 ? Math.max(...reviews.map((r) => r.id), 0) : 0;
       }
-      
+
       const newReview: Review = {
         id: maxId + 1,
         userId: currentUserId,
         type: reviewType,
-        targetId: reviewType === 'restaurant' ? restaurantId : selectedDishId!,
+        targetId: reviewType === "restaurant" ? restaurantId : selectedDishId!,
         rating,
         comment,
         createdAt: new Date().toISOString(),
@@ -344,7 +420,13 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
         isEdited: false,
       };
       setReviews([newReview, ...reviews]);
-      toast.success(t('review.createSuccess'));
+
+      // Update dish rating if this is a dish review
+      if (reviewType === "dish" && selectedDishId) {
+        setTimeout(() => updateDishRatingInStorage(selectedDishId), 100);
+      }
+
+      toast.success(t("review.createSuccess"));
     }
 
     setIsDialogOpen(false);
@@ -355,19 +437,85 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
   const handleDelete = () => {
     if (selectedReview) {
       setReviews(reviews.filter((r) => r.id !== selectedReview.id));
-      toast.success(t('review.deleteSuccess'));
+
+      // Update dish rating if this is a dish review
+      if (selectedReview.type === "dish") {
+        setTimeout(
+          () => updateDishRatingInStorage(selectedReview.targetId),
+          100
+        );
+      }
+
+      toast.success(t("review.deleteSuccess"));
       setIsDeleteDialogOpen(false);
       setSelectedReview(null);
     }
   };
 
+  // Helper function to update dish rating in localStorage
+  const updateDishRatingInStorage = (dishId: number) => {
+    try {
+      // Get all reviews from localStorage
+      const savedReviews = localStorage.getItem("reviews");
+      if (!savedReviews) return;
+
+      const allReviews = JSON.parse(savedReviews);
+
+      // FIX: Filter only active reviews (not deleted)
+      const dishReviews = allReviews.filter(
+        (r: any) =>
+          r.targetId === dishId && r.type === "dish" && r.isDeleted !== true // Chỉ lấy reviews chưa bị xóa
+      );
+
+      // Calculate average rating and count
+      const totalRating = dishReviews.reduce(
+        (sum: number, r: any) => sum + r.rating,
+        0
+      );
+      const avgRating =
+        dishReviews.length > 0 ? totalRating / dishReviews.length : 0;
+      const reviewCount = dishReviews.length;
+
+      // Update dishes in localStorage
+      const savedDishes = localStorage.getItem("dishes");
+      if (savedDishes) {
+        const dishes = JSON.parse(savedDishes);
+        const dishIndex = dishes.findIndex((d: any) => d.id === dishId);
+
+        if (dishIndex !== -1) {
+          dishes[dishIndex] = {
+            ...dishes[dishIndex],
+            rating: Math.round(avgRating * 10) / 10, // Round to 1 decimal
+            reviews: reviewCount,
+          };
+
+          localStorage.setItem("dishes", JSON.stringify(dishes));
+
+          // Trigger storage event for other components
+          window.dispatchEvent(
+            new StorageEvent("storage", {
+              key: "dishes",
+              newValue: JSON.stringify(dishes),
+            })
+          );
+
+          console.log(
+            `Updated dish ${dishId}: rating=${dishes[dishIndex].rating}, reviews=${reviewCount}`
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Error updating dish rating:", error);
+    }
+  };
+
   const resetForm = () => {
     setRating(0);
-    setComment('');
+    setComment("");
     setSelectedReview(null);
-    setReviewType('restaurant');
+    setReviewType("restaurant");
     setSelectedDishId(null);
-    setDishSearchQuery('');
+    setDishSearchQuery("");
   };
 
   // Filter dishes by search query
@@ -377,19 +525,27 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
   });
 
   // Calculate statistics for restaurant and dishes separately
-  const restaurantReviews = reviews.filter((r) => r.type === 'restaurant');
-  const dishReviews = reviews.filter((r) => r.type === 'dish');
+  const restaurantReviews = reviews.filter((r) => r.type === "restaurant");
+  const dishReviews = reviews.filter((r) => r.type === "dish");
 
   const calculateStats = (reviewList: Review[]) => {
-    if (reviewList.length === 0) return { average: '0.0', distribution: {} };
-    
-    const average = (reviewList.reduce((sum, r) => sum + r.rating, 0) / reviewList.length).toFixed(1);
-    const distribution: { [key: number]: number } = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-    
+    if (reviewList.length === 0) return { average: "0.0", distribution: {} };
+
+    const average = (
+      reviewList.reduce((sum, r) => sum + r.rating, 0) / reviewList.length
+    ).toFixed(1);
+    const distribution: { [key: number]: number } = {
+      5: 0,
+      4: 0,
+      3: 0,
+      2: 0,
+      1: 0,
+    };
+
     reviewList.forEach((r) => {
       distribution[r.rating] = (distribution[r.rating] || 0) + 1;
     });
-    
+
     return { average, distribution };
   };
 
@@ -400,33 +556,38 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
     title: string,
     stats: { average: string; distribution: { [key: number]: number } },
     totalReviews: number,
-    type: 'restaurant' | 'dish'
+    type: "restaurant" | "dish"
   ) => (
     <div className="bg-muted/30 rounded-lg p-6">
-      <h3 className="text-lg font-bold text-foreground mb-4 text-center">{title}</h3>
+      <h3 className="text-lg font-bold text-foreground mb-4 text-center">
+        {title}
+      </h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="flex flex-col items-center justify-center">
-          <div className="text-5xl font-bold text-foreground mb-2">{stats.average}</div>
+          <div className="text-5xl font-bold text-foreground mb-2">
+            {stats.average}
+          </div>
           <div className="flex items-center mb-2">
             {[...Array(5)].map((_, i) => (
               <Star
                 key={i}
                 className={`w-5 h-5 ${
                   i < Math.floor(parseFloat(stats.average))
-                    ? 'fill-yellow-400 text-yellow-400'
-                    : 'text-gray-300'
+                    ? "fill-yellow-400 text-yellow-400"
+                    : "text-gray-300"
                 }`}
               />
             ))}
           </div>
           <div className="text-sm text-muted-foreground">
-            {totalReviews} {t('review.reviews')}
+            {totalReviews} {t("review.reviews")}
           </div>
         </div>
         <div className="space-y-2">
           {[5, 4, 3, 2, 1].map((stars) => {
             const count = stats.distribution[stars] || 0;
-            const percentage = totalReviews > 0 ? (count / totalReviews) * 100 : 0;
+            const percentage =
+              totalReviews > 0 ? (count / totalReviews) * 100 : 0;
             return (
               <div key={stars} className="flex items-center gap-2">
                 <span className="text-sm text-foreground w-8">{stars}★</span>
@@ -436,7 +597,9 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
                     style={{ width: `${percentage}%` }}
                   />
                 </div>
-                <span className="text-sm text-muted-foreground w-8 text-right">{count}</span>
+                <span className="text-sm text-muted-foreground w-8 text-right">
+                  {count}
+                </span>
               </div>
             );
           })}
@@ -452,23 +615,23 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-primary flex items-center">
             <MessageSquare className="w-6 h-6 mr-2" />
-            {t('review.title')}
+            {t("review.title")}
           </h2>
         </div>
 
         {/* Summary - Restaurant and Dishes */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {renderSummaryCard(
-            t('review.restaurantReviews'),
+            t("review.restaurantReviews"),
             restaurantStats,
             restaurantReviews.length,
-            'restaurant'
+            "restaurant"
           )}
           {renderSummaryCard(
-            t('review.dishReviews'),
+            t("review.dishReviews"),
             dishStats,
             dishReviews.length,
-            'dish'
+            "dish"
           )}
         </div>
 
@@ -480,7 +643,7 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
             size="lg"
           >
             <MessageSquare className="w-5 h-5 mr-2" />
-            {t('review.writeReview')}
+            {t("review.writeReview")}
           </Button>
         </div>
 
@@ -491,9 +654,9 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">{t('review.allReviews')}</SelectItem>
-              <SelectItem value="5">{t('review.fiveStars')}</SelectItem>
-              <SelectItem value="low">{t('review.lowRatings')}</SelectItem>
+              <SelectItem value="all">{t("review.allReviews")}</SelectItem>
+              <SelectItem value="5">{t("review.fiveStars")}</SelectItem>
+              <SelectItem value="low">{t("review.lowRatings")}</SelectItem>
             </SelectContent>
           </Select>
           <Select value={sortOrder} onValueChange={(v: any) => setSortOrder(v)}>
@@ -501,8 +664,8 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="newest">{t('review.newest')}</SelectItem>
-              <SelectItem value="oldest">{t('review.oldest')}</SelectItem>
+              <SelectItem value="newest">{t("review.newest")}</SelectItem>
+              <SelectItem value="oldest">{t("review.oldest")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -511,13 +674,15 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
         <div className="space-y-4">
           {filteredReviews.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              {t('review.noReviews')}
+              {t("review.noReviews")}
             </div>
           ) : (
             filteredReviews.map((review) => {
               const isOwner = review.userId === currentUserId;
               const targetName =
-                review.type === 'restaurant' ? restaurantName : getDishName(review.targetId);
+                review.type === "restaurant"
+                  ? restaurantName
+                  : getDishName(review.targetId);
               const userInfo = getUserInfo(review.userId);
 
               return (
@@ -535,17 +700,19 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
                       <div className="flex items-center justify-between mb-2">
                         <div>
                           <span className="font-bold text-foreground">
-                            {isOwner ? (session?.username || t('review.you')) : userInfo.username}
+                            {isOwner
+                              ? session?.username || t("review.you")
+                              : userInfo.username}
                           </span>
                           {review.isEdited && (
                             <span className="text-xs text-muted-foreground ml-2">
-                              ({t('review.edited')})
+                              ({t("review.edited")})
                             </span>
                           )}
                         </div>
                         <span className="text-xs text-muted-foreground">
                           {new Date(review.createdAt).toLocaleDateString(
-                            language === 'ja' ? 'ja-JP' : 'vi-VN'
+                            language === "ja" ? "ja-JP" : "vi-VN"
                           )}
                         </span>
                       </div>
@@ -556,20 +723,22 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
                               key={i}
                               className={`w-4 h-4 ${
                                 i < review.rating
-                                  ? 'fill-yellow-400 text-yellow-400'
-                                  : 'text-gray-300'
+                                  ? "fill-yellow-400 text-yellow-400"
+                                  : "text-gray-300"
                               }`}
                             />
                           ))}
                         </div>
-                        <span className={`text-xs px-2 py-0.5 rounded-full ${
-                          review.type === 'dish'
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-green-500 text-white'
-                        }`}>
-                          {review.type === 'restaurant'
-                            ? t('review.restaurant')
-                            : `${t('review.dish')}: ${targetName}`}
+                        <span
+                          className={`text-xs px-2 py-0.5 rounded-full ${
+                            review.type === "dish"
+                              ? "bg-blue-500 text-white"
+                              : "bg-green-500 text-white"
+                          }`}
+                        >
+                          {review.type === "restaurant"
+                            ? t("review.restaurant")
+                            : `${t("review.dish")}: ${targetName}`}
                         </span>
                       </div>
                       <p className="text-sm text-foreground/90 leading-relaxed mb-3">
@@ -589,22 +758,28 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle>
-              {selectedReview ? t('review.editReview') : t('review.writeReview')}
+              {selectedReview
+                ? t("review.editReview")
+                : t("review.writeReview")}
             </DialogTitle>
           </DialogHeader>
-          
+
           {selectedReview ? (
             // Edit mode - show existing review type
             <div className="space-y-4 overflow-y-auto">
               <div className="text-sm text-muted-foreground">
-                {reviewType === 'restaurant'
-                  ? `${t('review.restaurant')}: ${restaurantName}`
-                  : `${t('review.dish')}: ${selectedDishId ? getDishName(selectedDishId) : ''}`}
+                {reviewType === "restaurant"
+                  ? `${t("review.restaurant")}: ${restaurantName}`
+                  : `${t("review.dish")}: ${
+                      selectedDishId ? getDishName(selectedDishId) : ""
+                    }`}
               </div>
 
               {/* Rating */}
               <div>
-                <label className="text-sm font-medium mb-2 block">{t('review.rating')}</label>
+                <label className="text-sm font-medium mb-2 block">
+                  {t("review.rating")}
+                </label>
                 <div className="flex items-center gap-2">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
@@ -618,8 +793,8 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
                       <Star
                         className={`w-8 h-8 ${
                           star <= (hoverRating || rating)
-                            ? 'fill-yellow-400 text-yellow-400'
-                            : 'text-gray-300'
+                            ? "fill-yellow-400 text-yellow-400"
+                            : "text-gray-300"
                         }`}
                       />
                     </button>
@@ -627,65 +802,83 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
                 </div>
                 <div className="h-5 mt-1">
                   <p className="text-xs text-muted-foreground">
-                    {(hoverRating || rating) > 0 
-                      ? RATING_LABELS[language as keyof typeof RATING_LABELS][(hoverRating || rating) - 1]
-                      : '\u00A0'}
+                    {(hoverRating || rating) > 0
+                      ? RATING_LABELS[language as keyof typeof RATING_LABELS][
+                          (hoverRating || rating) - 1
+                        ]
+                      : "\u00A0"}
                   </p>
                 </div>
               </div>
 
               {/* Comment */}
               <div>
-                <label className="text-sm font-medium mb-2 block">{t('review.comment')}</label>
+                <label className="text-sm font-medium mb-2 block">
+                  {t("review.comment")}
+                </label>
                 <Textarea
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-                  placeholder={t('review.commentPlaceholder')}
+                  placeholder={t("review.commentPlaceholder")}
                   maxLength={300}
                   rows={4}
                   className="focus-visible:ring-primary"
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  {comment.length}/300 {t('review.characters')}
+                  {comment.length}/300 {t("review.characters")}
                 </p>
               </div>
 
               {/* Actions */}
               <div className="flex gap-2 justify-end">
-                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                  {t('review.cancel')}
+                <Button
+                  variant="outline"
+                  onClick={() => setIsDialogOpen(false)}
+                >
+                  {t("review.cancel")}
                 </Button>
-                <Button onClick={handleSubmit}>{t('review.submit')}</Button>
+                <Button onClick={handleSubmit}>{t("review.submit")}</Button>
               </div>
             </div>
           ) : (
             // Create mode - show tabs
-            <Tabs value={reviewType} onValueChange={(v: any) => setReviewType(v)} className="flex-1 flex flex-col overflow-hidden">
+            <Tabs
+              value={reviewType}
+              onValueChange={(v: any) => setReviewType(v)}
+              className="flex-1 flex flex-col overflow-hidden"
+            >
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger 
-                  value="restaurant" 
+                <TabsTrigger
+                  value="restaurant"
                   disabled={hasReviewedRestaurant}
                   className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
-                  {t('review.restaurant')}
-                  {hasReviewedRestaurant && <span className="ml-1 text-green-500">✓</span>}
+                  {t("review.restaurant")}
+                  {hasReviewedRestaurant && (
+                    <span className="ml-1 text-green-500">✓</span>
+                  )}
                 </TabsTrigger>
-                <TabsTrigger 
+                <TabsTrigger
                   value="dish"
                   className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
-                  {t('review.dish')}
+                  {t("review.dish")}
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="restaurant" className="flex-1 space-y-4 overflow-y-auto mt-4">
+              <TabsContent
+                value="restaurant"
+                className="flex-1 space-y-4 overflow-y-auto mt-4"
+              >
                 <div className="text-sm text-muted-foreground">
-                  {t('review.restaurant')}: {restaurantName}
+                  {t("review.restaurant")}: {restaurantName}
                 </div>
 
                 {/* Rating */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">{t('review.rating')}</label>
+                  <label className="text-sm font-medium mb-2 block">
+                    {t("review.rating")}
+                  </label>
                   <div className="flex items-center gap-2">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <button
@@ -699,8 +892,8 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
                         <Star
                           className={`w-8 h-8 ${
                             star <= (hoverRating || rating)
-                              ? 'fill-yellow-400 text-yellow-400'
-                              : 'text-gray-300'
+                              ? "fill-yellow-400 text-yellow-400"
+                              : "text-gray-300"
                           }`}
                         />
                       </button>
@@ -708,39 +901,49 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
                   </div>
                   <div className="h-5 mt-1">
                     <p className="text-xs text-muted-foreground">
-                      {(hoverRating || rating) > 0 
-                        ? RATING_LABELS[language as keyof typeof RATING_LABELS][(hoverRating || rating) - 1]
-                        : '\u00A0'}
+                      {(hoverRating || rating) > 0
+                        ? RATING_LABELS[language as keyof typeof RATING_LABELS][
+                            (hoverRating || rating) - 1
+                          ]
+                        : "\u00A0"}
                     </p>
                   </div>
                 </div>
 
                 {/* Comment */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">{t('review.comment')}</label>
+                  <label className="text-sm font-medium mb-2 block">
+                    {t("review.comment")}
+                  </label>
                   <Textarea
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
-                    placeholder={t('review.commentPlaceholder')}
+                    placeholder={t("review.commentPlaceholder")}
                     maxLength={300}
                     rows={4}
                     className="focus-visible:ring-primary"
                   />
                   <p className="text-xs text-muted-foreground mt-1">
-                    {comment.length}/300 {t('review.characters')}
+                    {comment.length}/300 {t("review.characters")}
                   </p>
                 </div>
 
                 {/* Actions */}
                 <div className="flex gap-2 justify-end">
-                  <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                    {t('review.cancel')}
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsDialogOpen(false)}
+                  >
+                    {t("review.cancel")}
                   </Button>
-                  <Button onClick={handleSubmit}>{t('review.submit')}</Button>
+                  <Button onClick={handleSubmit}>{t("review.submit")}</Button>
                 </div>
               </TabsContent>
 
-              <TabsContent value="dish" className="flex-1 flex flex-col overflow-hidden mt-4">
+              <TabsContent
+                value="dish"
+                className="flex-1 flex flex-col overflow-hidden mt-4"
+              >
                 <div className="space-y-4 flex-1 flex flex-col overflow-hidden">
                   {/* Search */}
                   <div className="relative">
@@ -748,14 +951,16 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
                     <Input
                       value={dishSearchQuery}
                       onChange={(e) => setDishSearchQuery(e.target.value)}
-                      placeholder={t('review.searchDish')}
+                      placeholder={t("review.searchDish")}
                       className="pl-9 focus-visible:ring-primary"
                     />
                   </div>
 
                   {/* Dish Selection */}
                   <div className="flex-1 overflow-hidden">
-                    <label className="text-sm font-medium mb-2 block">{t('review.selectDish')}</label>
+                    <label className="text-sm font-medium mb-2 block">
+                      {t("review.selectDish")}
+                    </label>
                     <ScrollArea className="h-[280px] border rounded-lg p-2">
                       <div className="grid grid-cols-4 gap-2">
                         {filteredDishes.map((dish) => {
@@ -768,10 +973,10 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
                               disabled={alreadyReviewed}
                               className={`flex flex-col items-center p-1.5 rounded-lg border-2 transition-all ${
                                 isSelected
-                                  ? 'border-primary bg-primary/10'
+                                  ? "border-primary bg-primary/10"
                                   : alreadyReviewed
-                                  ? 'border-muted bg-muted/50 opacity-50 cursor-not-allowed'
-                                  : 'border-border hover:border-primary/50'
+                                  ? "border-muted bg-muted/50 opacity-50 cursor-not-allowed"
+                                  : "border-border hover:border-primary/50"
                               }`}
                             >
                               <div className="w-full aspect-square mb-1 overflow-hidden rounded-md">
@@ -785,7 +990,10 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
                                 {getDishName(dish.id)}
                               </span>
                               {alreadyReviewed && (
-                                <Badge variant="secondary" className="mt-0.5 text-[9px] py-0 px-1 h-4">
+                                <Badge
+                                  variant="secondary"
+                                  className="mt-0.5 text-[9px] py-0 px-1 h-4"
+                                >
                                   ✓
                                 </Badge>
                               )}
@@ -800,7 +1008,9 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
                     <>
                       {/* Rating */}
                       <div>
-                        <label className="text-sm font-medium mb-2 block">{t('review.rating')}</label>
+                        <label className="text-sm font-medium mb-2 block">
+                          {t("review.rating")}
+                        </label>
                         <div className="flex items-center gap-2">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <button
@@ -814,8 +1024,8 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
                               <Star
                                 className={`w-8 h-8 ${
                                   star <= (hoverRating || rating)
-                                    ? 'fill-yellow-400 text-yellow-400'
-                                    : 'text-gray-300'
+                                    ? "fill-yellow-400 text-yellow-400"
+                                    : "text-gray-300"
                                 }`}
                               />
                             </button>
@@ -823,26 +1033,30 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
                         </div>
                         <div className="h-5 mt-1">
                           <p className="text-xs text-muted-foreground">
-                            {(hoverRating || rating) > 0 
-                              ? RATING_LABELS[language as keyof typeof RATING_LABELS][(hoverRating || rating) - 1]
-                              : '\u00A0'}
+                            {(hoverRating || rating) > 0
+                              ? RATING_LABELS[
+                                  language as keyof typeof RATING_LABELS
+                                ][(hoverRating || rating) - 1]
+                              : "\u00A0"}
                           </p>
                         </div>
                       </div>
 
                       {/* Comment */}
                       <div>
-                        <label className="text-sm font-medium mb-2 block">{t('review.comment')}</label>
+                        <label className="text-sm font-medium mb-2 block">
+                          {t("review.comment")}
+                        </label>
                         <Textarea
                           value={comment}
                           onChange={(e) => setComment(e.target.value)}
-                          placeholder={t('review.commentPlaceholder')}
+                          placeholder={t("review.commentPlaceholder")}
                           maxLength={300}
                           rows={3}
                           className="focus-visible:ring-primary"
                         />
                         <p className="text-xs text-muted-foreground mt-1">
-                          {comment.length}/300 {t('review.characters')}
+                          {comment.length}/300 {t("review.characters")}
                         </p>
                       </div>
                     </>
@@ -850,11 +1064,14 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
 
                   {/* Actions */}
                   <div className="flex gap-2 justify-end">
-                    <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                      {t('review.cancel')}
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsDialogOpen(false)}
+                    >
+                      {t("review.cancel")}
                     </Button>
                     <Button onClick={handleSubmit} disabled={!selectedDishId}>
-                      {t('review.submit')}
+                      {t("review.submit")}
                     </Button>
                   </div>
                 </div>
@@ -865,19 +1082,27 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('review.deleteConfirmTitle')}</AlertDialogTitle>
-            <AlertDialogDescription>{t('review.deleteConfirmMessage')}</AlertDialogDescription>
+            <AlertDialogTitle>
+              {t("review.deleteConfirmTitle")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("review.deleteConfirmMessage")}
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('review.cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>{t('review.confirmDelete')}</AlertDialogAction>
+            <AlertDialogCancel>{t("review.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>
+              {t("review.confirmDelete")}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </div>
   );
 }
-

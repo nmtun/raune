@@ -77,38 +77,62 @@ export default function FoodManagement() {
 
   // Load dishes from localStorage or use default data
   useEffect(() => {
-    const savedDishes = localStorage.getItem("dishes");
-    if (savedDishes) {
-      try {
-        const parsed = JSON.parse(savedDishes);
-        // Kiểm tra JSON có phải array không
-        if (Array.isArray(parsed) && parsed.length >= 0) {
-          setDishes(parsed);
-        } else {
-          console.warn("Invalid dishes format, using default data");
+    const loadDishes = () => {
+      const savedDishes = localStorage.getItem("dishes");
+      if (savedDishes) {
+        try {
+          const parsed = JSON.parse(savedDishes);
+          // Kiểm tra JSON có phải array không
+          if (Array.isArray(parsed) && parsed.length >= 0) {
+            setDishes(parsed);
+          } else {
+            console.warn("Invalid dishes format, using default data");
+            setDishes(dishesData);
+            toast({
+              title: t("admin.dataError") || "Lỗi dữ liệu",
+              description:
+                t("admin.dataErrorDesc") ||
+                "Dữ liệu món ăn không hợp lệ. Đã tải dữ liệu mặc định.",
+              variant: "destructive",
+            });
+          }
+        } catch (error) {
+          console.error("Error parsing dishes:", error);
           setDishes(dishesData);
           toast({
-            title: t("admin.dataError") || "Lỗi dữ liệu",
+            title: t("admin.parseError") || "Lỗi đọc dữ liệu",
             description:
-              t("admin.dataErrorDesc") ||
-              "Dữ liệu món ăn không hợp lệ. Đã tải dữ liệu mặc định.",
+              t("admin.parseErrorDesc") ||
+              "Không thể đọc dữ liệu món ăn. Đã tải dữ liệu mặc định.",
             variant: "destructive",
           });
         }
-      } catch (error) {
-        console.error("Error parsing dishes:", error);
+      } else {
         setDishes(dishesData);
-        toast({
-          title: t("admin.parseError") || "Lỗi đọc dữ liệu",
-          description:
-            t("admin.parseErrorDesc") ||
-            "Không thể đọc dữ liệu món ăn. Đã tải dữ liệu mặc định.",
-          variant: "destructive",
-        });
       }
-    } else {
-      setDishes(dishesData);
-    }
+    };
+
+    // Initial load
+    loadDishes();
+
+    // Listen for storage events (when dishes are updated in other tabs/components)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "dishes") {
+        loadDishes();
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    // Also check periodically for changes (in case same tab updates)
+    const interval = setInterval(() => {
+      loadDishes();
+    }, 2000); // Check every 2 seconds
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      clearInterval(interval);
+    };
   }, [toast, t]);
 
   // --- HÀM TRA CỨU ---

@@ -1,16 +1,16 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
-import { Button } from '@/components/ui/button';
-import { DishDetailDialog } from '@/components/DishDetailDialog';
-import { ReviewSection } from '@/components/ReviewSection';
-import { useGeolocation } from '@/hooks/useGeolocation';
-import { useLanguage } from '@/hooks/useLanguage';
-import { ArrowLeft, MapPin, Star } from 'lucide-react';
-import menusData from '@/data/menus.json';
-import { formatDistance, calculateDistance } from '@/utils/distance';
-import { getRestaurantById } from '@/utils/restaurantUtils';
-import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from "react-router-dom";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+import { Button } from "@/components/ui/button";
+import { DishDetailDialog } from "@/components/DishDetailDialog";
+import { ReviewSection } from "@/components/ReviewSection";
+import { useGeolocation } from "@/hooks/useGeolocation";
+import { useLanguage } from "@/hooks/useLanguage";
+import { ArrowLeft, MapPin, Star } from "lucide-react";
+import menusDataDefault from "@/data/menus.json";
+import { formatDistance, calculateDistance } from "@/utils/distance";
+import { getRestaurantById } from "@/utils/restaurantUtils";
+import { useState, useEffect } from "react";
 
 interface Restaurant {
   id: number;
@@ -33,16 +33,59 @@ const RestaurantDetail = () => {
   const [selectedDish, setSelectedDish] = useState<any | null>(null);
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [restaurantMenus, setRestaurantMenus] = useState<any[]>([]);
+  const [menusData, setMenusData] = useState<any[]>([]);
+
+  // Load dishes from localStorage or use default data
+  useEffect(() => {
+    const loadDishes = () => {
+      const savedDishes = localStorage.getItem("dishes");
+      if (savedDishes) {
+        try {
+          const parsed = JSON.parse(savedDishes);
+          if (Array.isArray(parsed)) {
+            setMenusData(parsed);
+          } else {
+            setMenusData(menusDataDefault);
+          }
+        } catch (error) {
+          console.error("Error parsing dishes:", error);
+          setMenusData(menusDataDefault);
+        }
+      } else {
+        setMenusData(menusDataDefault);
+      }
+    };
+
+    // Initial load
+    loadDishes();
+
+    // Listen for storage events
+    const handleStorageChange = () => {
+      loadDishes();
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    // Check every 1 second for updates
+    const interval = setInterval(loadDishes, 1000);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
 
   // Load restaurant from localStorage
   useEffect(() => {
     const restaurantId = Number(id);
-    if (restaurantId) {
+    if (restaurantId && menusData.length > 0) {
       const restaurantData = getRestaurantById(restaurantId);
       setRestaurant(restaurantData);
-      setRestaurantMenus(menusData.filter((m) => m.restaurantId === restaurantId));
+      setRestaurantMenus(
+        menusData.filter((m) => m.restaurantId === restaurantId)
+      );
     }
-  }, [id]);
+  }, [id, menusData]);
 
   // Update restaurant stats when reviews change (listen to localStorage changes)
   useEffect(() => {
@@ -57,47 +100,56 @@ const RestaurantDetail = () => {
     };
 
     // Listen for storage events (when reviews are updated in other tabs/components)
-    window.addEventListener('storage', handleStorageChange);
-    
+    window.addEventListener("storage", handleStorageChange);
+
     // Also check periodically for changes (in case same tab updates)
     const interval = setInterval(() => {
       const restaurantId = Number(id);
       if (restaurantId && restaurant) {
         const updatedRestaurant = getRestaurantById(restaurantId);
-        if (updatedRestaurant && (
-          updatedRestaurant.rating !== restaurant.rating || 
-          updatedRestaurant.reviews !== restaurant.reviews
-        )) {
+        if (
+          updatedRestaurant &&
+          (updatedRestaurant.rating !== restaurant.rating ||
+            updatedRestaurant.reviews !== restaurant.reviews)
+        ) {
           setRestaurant(updatedRestaurant);
         }
       }
     }, 1000); // Check every second
 
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener("storage", handleStorageChange);
       clearInterval(interval);
     };
   }, [id, restaurant]);
 
   // Calculate distance
   const distance = restaurant
-    ? calculateDistance(location.lat, location.lng, restaurant.lat, restaurant.lng)
+    ? calculateDistance(
+        location.lat,
+        location.lng,
+        restaurant.lat,
+        restaurant.lng
+      )
     : 0;
 
   // Helper to get dish name
   const getDishName = (dishName: string | { vi: string; ja: string }) => {
-    if (typeof dishName === 'string') {
+    if (typeof dishName === "string") {
       return dishName;
     }
     return dishName[language as keyof typeof dishName] || dishName.vi;
   };
-  
 
   if (!restaurant) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
         <Header
-          location={location.isFallback ? t('location.defaultLocation') : t('location.yourLocation')}
+          location={
+            location.isFallback
+              ? t("location.defaultLocation")
+              : t("location.yourLocation")
+          }
           onRefreshLocation={location.refreshLocation}
           isLoadingLocation={location.loading}
           isFallbackLocation={location.isFallback}
@@ -105,10 +157,10 @@ const RestaurantDetail = () => {
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-foreground mb-4">
-              {t('restaurantDetail.notFound')}
+              {t("restaurantDetail.notFound")}
             </h2>
-            <Button onClick={() => navigate('/')}>
-              {t('restaurantDetail.backToHome')}
+            <Button onClick={() => navigate("/")}>
+              {t("restaurantDetail.backToHome")}
             </Button>
           </div>
         </div>
@@ -120,7 +172,11 @@ const RestaurantDetail = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header
-        location={location.isFallback ? t('location.defaultLocation') : t('location.yourLocation')}
+        location={
+          location.isFallback
+            ? t("location.defaultLocation")
+            : t("location.yourLocation")
+        }
         onRefreshLocation={location.refreshLocation}
         isLoadingLocation={location.loading}
         isFallbackLocation={location.isFallback}
@@ -129,13 +185,9 @@ const RestaurantDetail = () => {
       <div className="flex-1">
         <div className="container mx-auto px-4 py-6 max-w-7xl">
           {/* Back Button */}
-          <Button
-            variant="ghost"
-            onClick={() => navigate(-1)}
-            className="mb-4"
-          >
+          <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            {t('restaurantDetail.back')}
+            {t("restaurantDetail.back")}
           </Button>
 
           {/* Restaurant Header - Full Width */}
@@ -167,14 +219,15 @@ const RestaurantDetail = () => {
                       </span>
                     </div>
                     <span className="text-sm text-muted-foreground">
-                      ({restaurant.reviews} {t('common.reviews')})
+                      ({restaurant.reviews} {t("common.reviews")})
                     </span>
                   </div>
 
                   {/* Category Badge */}
                   <div className="flex items-center gap-2 mb-4">
                     <span className="px-3 py-1 text-sm bg-secondary text-secondary-foreground rounded-full font-medium">
-                      {t(`categories.${restaurant.category.toLowerCase()}`) || restaurant.category}
+                      {t(`categories.${restaurant.category.toLowerCase()}`) ||
+                        restaurant.category}
                     </span>
                   </div>
                 </div>
@@ -186,12 +239,14 @@ const RestaurantDetail = () => {
                   <div className="bg-primary/10 border-2 border-primary/30 rounded-lg p-5">
                     <h3 className="text-lg font-bold text-primary mb-4 flex items-center">
                       <MapPin className="w-5 h-5 mr-2" />
-                      {t('restaurantDetail.storeInfo')}
+                      {t("restaurantDetail.storeInfo")}
                     </h3>
                     <div className="space-y-3">
                       <div className="flex items-start">
                         <span className="text-sm text-foreground">
-                          <span className="font-medium">{t('restaurantDetail.address')}:</span>{' '}
+                          <span className="font-medium">
+                            {t("restaurantDetail.address")}:
+                          </span>{" "}
                           {restaurant.address}
                         </span>
                       </div>
@@ -210,9 +265,11 @@ const RestaurantDetail = () => {
                     {/* Description */}
                     <div className="mt-4 pt-4 border-t border-primary/20">
                       <p className="text-sm text-foreground/80 leading-relaxed">
-                        {t('restaurantDetail.description', {
+                        {t("restaurantDetail.description", {
                           name: restaurant.name,
-                          category: t(`categories.${restaurant.category.toLowerCase()}`),
+                          category: t(
+                            `categories.${restaurant.category.toLowerCase()}`
+                          ),
                         })}
                       </p>
                     </div>
@@ -223,24 +280,49 @@ const RestaurantDetail = () => {
                 <div className="lg:col-span-1">
                   <div className="bg-background border-2 border-border rounded-lg p-5">
                     <h3 className="text-lg font-bold text-foreground mb-4">
-                      {t('restaurantDetail.openingHours')}
+                      {t("restaurantDetail.openingHours")}
                     </h3>
                     <div className="space-y-2">
                       {[
-                        { day: t('restaurantDetail.monday'), hours: '8:00~23:00' },
-                        { day: t('restaurantDetail.tuesday'), hours: '8:00~23:00' },
-                        { day: t('restaurantDetail.wednesday'), hours: '8:00~23:00' },
-                        { day: t('restaurantDetail.thursday'), hours: '8:00~23:00' },
-                        { day: t('restaurantDetail.friday'), hours: '8:00~23:00' },
-                        { day: t('restaurantDetail.saturday'), hours: '8:00~23:00' },
-                        { day: t('restaurantDetail.sunday'), hours: '8:00~23:00' },
+                        {
+                          day: t("restaurantDetail.monday"),
+                          hours: "8:00~23:00",
+                        },
+                        {
+                          day: t("restaurantDetail.tuesday"),
+                          hours: "8:00~23:00",
+                        },
+                        {
+                          day: t("restaurantDetail.wednesday"),
+                          hours: "8:00~23:00",
+                        },
+                        {
+                          day: t("restaurantDetail.thursday"),
+                          hours: "8:00~23:00",
+                        },
+                        {
+                          day: t("restaurantDetail.friday"),
+                          hours: "8:00~23:00",
+                        },
+                        {
+                          day: t("restaurantDetail.saturday"),
+                          hours: "8:00~23:00",
+                        },
+                        {
+                          day: t("restaurantDetail.sunday"),
+                          hours: "8:00~23:00",
+                        },
                       ].map((schedule, index) => (
                         <div
                           key={index}
                           className="flex justify-between items-center text-sm py-1"
                         >
-                          <span className="text-foreground font-medium">{schedule.day}</span>
-                          <span className="text-foreground">{schedule.hours}</span>
+                          <span className="text-foreground font-medium">
+                            {schedule.day}
+                          </span>
+                          <span className="text-foreground">
+                            {schedule.hours}
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -256,7 +338,7 @@ const RestaurantDetail = () => {
               <div className="p-6">
                 <h2 className="text-2xl font-bold text-primary mb-6 flex items-center">
                   <span className="mr-2">🍽️</span>
-                  {t('restaurantDetail.menu')}
+                  {t("restaurantDetail.menu")}
                 </h2>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
@@ -283,8 +365,8 @@ const RestaurantDetail = () => {
                               key={i}
                               className={`w-3 h-3 ${
                                 i < Math.floor(menu.rating)
-                                  ? 'fill-yellow-400 text-yellow-400'
-                                  : 'text-gray-300'
+                                  ? "fill-yellow-400 text-yellow-400"
+                                  : "text-gray-300"
                               }`}
                             />
                           ))}
@@ -293,7 +375,7 @@ const RestaurantDetail = () => {
                           </span>
                         </div>
                         <p className="text-base font-bold text-primary">
-                          {menu.price.toLocaleString('vi-VN')} VND
+                          {menu.price.toLocaleString("vi-VN")} VND
                         </p>
                       </div>
                     </div>
@@ -304,7 +386,10 @@ const RestaurantDetail = () => {
           )}
 
           {/* Reviews Section */}
-          <ReviewSection restaurantId={restaurant.id} restaurantName={restaurant.name} />
+          <ReviewSection
+            restaurantId={restaurant.id}
+            restaurantName={restaurant.name}
+          />
         </div>
       </div>
 
@@ -324,4 +409,3 @@ const RestaurantDetail = () => {
 };
 
 export default RestaurantDetail;
-

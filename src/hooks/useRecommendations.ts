@@ -1,9 +1,9 @@
-import { useMemo } from 'react';
-import restaurantsData from '@/data/restaurants.json';
-import menusData from '@/data/menus.json';
-import accountsData from '@/data/accounts.json';
-import { calculateDistance } from '@/utils/distance';
-import { getCurrentAccountFromSession } from '@/utils/profileUtils';
+import { useMemo, useEffect, useState } from "react";
+import restaurantsData from "@/data/restaurants.json";
+import menusDataDefault from "@/data/menus.json";
+import accountsData from "@/data/accounts.json";
+import { calculateDistance } from "@/utils/distance";
+import { getCurrentAccountFromSession } from "@/utils/profileUtils";
 
 interface Restaurant {
   id: number;
@@ -38,16 +38,42 @@ interface RecommendationScore {
 
 const MAX_DISTANCE_KM = 10;
 
-export function useRecommendations(userLat: number, userLng: number, maxDistance: number = MAX_DISTANCE_KM) {
+export function useRecommendations(
+  userLat: number,
+  userLng: number,
+  maxDistance: number = MAX_DISTANCE_KM
+) {
   // Get current user from session or fallback to first account
   const session = getCurrentAccountFromSession();
   const userId = session?.userId || 1;
-  const user = accountsData.find(acc => acc.id === userId) || accountsData[0];
+  const user = accountsData.find((acc) => acc.id === userId) || accountsData[0];
+
+  const [menusData, setMenusData] = useState<Menu[]>([]);
+
+  // Load dishes from localStorage or use default data
+  useEffect(() => {
+    const savedDishes = localStorage.getItem("dishes");
+    if (savedDishes) {
+      try {
+        const parsed = JSON.parse(savedDishes);
+        if (Array.isArray(parsed)) {
+          setMenusData(parsed);
+        } else {
+          setMenusData(menusDataDefault as Menu[]);
+        }
+      } catch (error) {
+        console.error("Error parsing dishes:", error);
+        setMenusData(menusDataDefault as Menu[]);
+      }
+    } else {
+      setMenusData(menusDataDefault as Menu[]);
+    }
+  }, []);
 
   const recommendedDishes = useMemo(() => {
     const restaurants = restaurantsData as Restaurant[];
-    const menus = menusData as Menu[];
-    
+    const menus = menusData;
+
     // Calculate scores for each menu item
     const scored: RecommendationScore[] = menus
       .map((menu) => {
@@ -71,7 +97,10 @@ export function useRecommendations(userLat: number, userLng: number, maxDistance
           score: 0, // Not used for sorting anymore
         };
       })
-      .filter((item): item is RecommendationScore & { menu: Menu } => item !== null && item.menu !== undefined)
+      .filter(
+        (item): item is RecommendationScore & { menu: Menu } =>
+          item !== null && item.menu !== undefined
+      )
       .sort((a, b) => {
         // Sort by distance first (ascending)
         if (a.distance !== b.distance) {
@@ -83,11 +112,11 @@ export function useRecommendations(userLat: number, userLng: number, maxDistance
       .slice(0, 8);
 
     return scored;
-  }, [userLat, userLng, maxDistance]);
+  }, [userLat, userLng, maxDistance, menusData]);
 
   const recommendedRestaurants = useMemo(() => {
     const restaurants = restaurantsData as Restaurant[];
-    
+
     const scored: RecommendationScore[] = restaurants
       .map((restaurant) => {
         const distance = calculateDistance(
