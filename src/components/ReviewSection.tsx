@@ -29,6 +29,7 @@ import { toast } from 'sonner';
 import reviewsData from '@/data/reviews.json';
 import menusData from '@/data/menus.json';
 import { getCurrentAccountFromSession, getAllAccounts } from '@/utils/profileUtils';
+import { filterDeletedReviews, addDeletedReviewId } from '@/utils/reviewStorage';
 
 interface Review {
   id: number;
@@ -144,6 +145,9 @@ export function ReviewSection({ restaurantId, restaurantName }: ReviewSectionPro
       allReviews = reviewsData as Review[];
       localStorage.setItem('reviews', JSON.stringify(allReviews));
     }
+    
+    // Filter out deleted reviews
+    allReviews = filterDeletedReviews(allReviews);
     
     // Filter reviews for this restaurant
     const restaurantReviews = allReviews.filter(

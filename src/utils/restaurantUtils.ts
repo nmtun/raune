@@ -1,5 +1,6 @@
 import restaurantsData from '@/data/restaurants.json';
 import reviewsData from '@/data/reviews.json';
+import { filterDeletedReviews } from './reviewStorage';
 
 const STORAGE_KEY_RESTAURANTS = 'restaurants';
 const STORAGE_KEY_RESTAURANTS_INITIALIZED = 'restaurantsInitialized';
@@ -75,6 +76,8 @@ export const getAllRestaurants = (): Restaurant[] => {
 const getAllReviews = (): Review[] => {
   try {
     const savedReviews = localStorage.getItem('reviews');
+    let allReviews: Review[] = [];
+    
     if (savedReviews) {
       const parsedReviews = JSON.parse(savedReviews);
       // Merge với dữ liệu từ JSON để đảm bảo có đầy đủ reviews
@@ -95,13 +98,16 @@ const getAllReviews = (): Review[] => {
         }
       });
 
-      return Array.from(mergedReviews.values());
+      allReviews = Array.from(mergedReviews.values());
     } else {
-      return reviewsData as Review[];
+      allReviews = reviewsData as Review[];
     }
+    
+    // Filter out deleted reviews
+    return filterDeletedReviews(allReviews);
   } catch (error) {
     console.error('Error getting reviews:', error);
-    return reviewsData as Review[];
+    return filterDeletedReviews(reviewsData as Review[]);
   }
 };
 

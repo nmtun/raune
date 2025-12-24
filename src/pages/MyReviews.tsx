@@ -10,6 +10,7 @@ import reviewsData from '@/data/reviews.json';
 import restaurantsData from '@/data/restaurants.json';
 import menusData from '@/data/menus.json';
 import { getCurrentAccountFromSession } from '@/utils/profileUtils';
+import { filterDeletedReviews } from '@/utils/reviewStorage';
 
 interface Review {
   id: number;
@@ -46,6 +47,9 @@ const MyReviews = () => {
     } else {
       allReviews = reviewsData as Review[];
     }
+    
+    // Filter out deleted reviews
+    allReviews = filterDeletedReviews(allReviews);
     
     // Filter only current user's reviews
     const userReviews = allReviews.filter((r) => r.userId === currentUserId);
