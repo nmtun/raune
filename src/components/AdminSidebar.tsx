@@ -37,6 +37,9 @@ export function AdminSidebar() {
           console.error("Session error", error);
         }
       }
+      if (currentLocation.pathname === "/admin" || currentLocation.pathname === "/admin/") {
+        navigate("/admin/restaurant_management", { replace: true });
+      }
     };
 
     checkSession();
@@ -59,11 +62,7 @@ export function AdminSidebar() {
 
   // Danh sách menu quản lý
   const menuItems = [
-    {
-      title: t("admin.dashboard"),
-      path: "/admin",
-      icon: <LayoutDashboard className="w-5 h-5" />,
-    },
+
     {
       title: t("admin.restaurant"),
       path: "/admin/restaurant_management",
@@ -129,11 +128,10 @@ export function AdminSidebar() {
             <Link
               key={index}
               to={item.path}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${
-                isActive
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${isActive
                   ? "bg-white text-primary shadow-lg shadow-primary/20"
                   : "text-white hover:bg-white hover:text-primary"
-              }`}
+                }`}
             >
               {item.icon}
               <span className="font-medium text-sm">{item.title}</span>
