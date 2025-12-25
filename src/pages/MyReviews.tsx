@@ -1,21 +1,28 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { useLanguage } from '@/hooks/useLanguage';
-import { Star, MapPin, UtensilsCrossed, Store, Calendar, Edit2 } from 'lucide-react';
-import reviewsData from '@/data/reviews.json';
-import restaurantsData from '@/data/restaurants.json';
-import menusData from '@/data/menus.json';
-import { getCurrentAccountFromSession } from '@/utils/profileUtils';
-import { filterDeletedReviews } from '@/utils/reviewStorage';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/hooks/useLanguage";
+import {
+  Star,
+  MapPin,
+  UtensilsCrossed,
+  Store,
+  Calendar,
+  Edit2,
+} from "lucide-react";
+import reviewsData from "@/data/reviews.json";
+import restaurantsData from "@/data/restaurants.json";
+import menusDataDefault from "@/data/menus.json";
+import { getCurrentAccountFromSession } from "@/utils/profileUtils";
+import { filterDeletedReviews } from "@/utils/reviewStorage";
 
 interface Review {
   id: number;
   userId: number;
-  type: 'restaurant' | 'dish';
+  type: "restaurant" | "dish";
   targetId: number;
   rating: number;
   comment: string;
@@ -28,16 +35,37 @@ const MyReviews = () => {
   const navigate = useNavigate();
   const { t, language } = useLanguage();
   const [reviews, setReviews] = useState<Review[]>([]);
-  
+  const [menusData, setMenusData] = useState<any[]>([]);
+
+  // Load dishes from localStorage or use default data
+  useEffect(() => {
+    const savedDishes = localStorage.getItem("dishes");
+    if (savedDishes) {
+      try {
+        const parsed = JSON.parse(savedDishes);
+        if (Array.isArray(parsed)) {
+          setMenusData(parsed);
+        } else {
+          setMenusData(menusDataDefault);
+        }
+      } catch (error) {
+        console.error("Error parsing dishes:", error);
+        setMenusData(menusDataDefault);
+      }
+    } else {
+      setMenusData(menusDataDefault);
+    }
+  }, []);
+
   // Get current user from session
   const session = getCurrentAccountFromSession();
   const currentUserId = session?.userId || 1;
 
   // Load reviews from localStorage
   useEffect(() => {
-    const savedReviews = localStorage.getItem('reviews');
+    const savedReviews = localStorage.getItem("reviews");
     let allReviews: Review[] = [];
-    
+
     if (savedReviews) {
       try {
         allReviews = JSON.parse(savedReviews);
@@ -47,33 +75,33 @@ const MyReviews = () => {
     } else {
       allReviews = reviewsData as Review[];
     }
-    
+
     // Filter out deleted reviews
     allReviews = filterDeletedReviews(allReviews);
-    
+
     // Filter only current user's reviews
     const userReviews = allReviews.filter((r) => r.userId === currentUserId);
     setReviews(userReviews);
   }, [currentUserId]);
 
   // Get restaurant reviews
-  const restaurantReviews = reviews.filter((r) => r.type === 'restaurant');
-  
+  const restaurantReviews = reviews.filter((r) => r.type === "restaurant");
+
   // Get dish reviews
-  const dishReviews = reviews.filter((r) => r.type === 'dish');
+  const dishReviews = reviews.filter((r) => r.type === "dish");
 
   // Helper to get dish name
   const getDishName = (dishId: number) => {
     const dish = menusData.find((m) => m.id === dishId);
-    if (!dish) return '';
-    if (typeof dish.name === 'string') return dish.name;
+    if (!dish) return "";
+    if (typeof dish.name === "string") return dish.name;
     return dish.name[language as keyof typeof dish.name] || dish.name.vi;
   };
 
   // Helper to get restaurant name
   const getRestaurantName = (restaurantId: number) => {
     const restaurant = restaurantsData.find((r) => r.id === restaurantId);
-    return restaurant?.name || '';
+    return restaurant?.name || "";
   };
 
   // Helper to get restaurant for a dish
@@ -118,7 +146,7 @@ const MyReviews = () => {
               </div>
               <Button variant="outline" size="sm">
                 <Edit2 className="w-4 h-4 mr-1" />
-                {t('review.edit')}
+                {t("review.edit")}
               </Button>
             </div>
 
@@ -129,8 +157,8 @@ const MyReviews = () => {
                     key={i}
                     className={`w-5 h-5 ${
                       i < review.rating
-                        ? 'fill-yellow-400 text-yellow-400'
-                        : 'text-gray-300'
+                        ? "fill-yellow-400 text-yellow-400"
+                        : "text-gray-300"
                     }`}
                   />
                 ))}
@@ -138,10 +166,10 @@ const MyReviews = () => {
               <div className="flex items-center text-sm text-muted-foreground">
                 <Calendar className="w-4 h-4 mr-1" />
                 {new Date(review.createdAt).toLocaleDateString(
-                  language === 'ja' ? 'ja-JP' : 'vi-VN'
+                  language === "ja" ? "ja-JP" : "vi-VN"
                 )}
                 {review.isEdited && (
-                  <span className="ml-2 text-xs">({t('review.edited')})</span>
+                  <span className="ml-2 text-xs">({t("review.edited")})</span>
                 )}
               </div>
             </div>
@@ -184,7 +212,7 @@ const MyReviews = () => {
               </div>
               <Button variant="outline" size="sm">
                 <Edit2 className="w-4 h-4 mr-1" />
-                {t('review.edit')}
+                {t("review.edit")}
               </Button>
             </div>
 
@@ -195,8 +223,8 @@ const MyReviews = () => {
                     key={i}
                     className={`w-5 h-5 ${
                       i < review.rating
-                        ? 'fill-yellow-400 text-yellow-400'
-                        : 'text-gray-300'
+                        ? "fill-yellow-400 text-yellow-400"
+                        : "text-gray-300"
                     }`}
                   />
                 ))}
@@ -204,10 +232,10 @@ const MyReviews = () => {
               <div className="flex items-center text-sm text-muted-foreground">
                 <Calendar className="w-4 h-4 mr-1" />
                 {new Date(review.createdAt).toLocaleDateString(
-                  language === 'ja' ? 'ja-JP' : 'vi-VN'
+                  language === "ja" ? "ja-JP" : "vi-VN"
                 )}
                 {review.isEdited && (
-                  <span className="ml-2 text-xs">({t('review.edited')})</span>
+                  <span className="ml-2 text-xs">({t("review.edited")})</span>
                 )}
               </div>
             </div>
@@ -222,7 +250,7 @@ const MyReviews = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header
-        location={t('location.yourLocation')}
+        location={t("location.yourLocation")}
         onRefreshLocation={() => {}}
         isLoadingLocation={false}
         isFallbackLocation={false}
@@ -231,28 +259,28 @@ const MyReviews = () => {
       <main className="flex-1 container mx-auto px-4 py-8 max-w-5xl">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-foreground mb-2">
-            {t('myReviews.title')}
+            {t("myReviews.title")}
           </h1>
           <p className="text-muted-foreground">
-            {t('myReviews.subtitle', { count: reviews.length })}
+            {t("myReviews.subtitle", { count: reviews.length })}
           </p>
         </div>
 
         <Tabs defaultValue="restaurant" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-8">
-            <TabsTrigger 
+            <TabsTrigger
               value="restaurant"
               className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
               <Store className="w-4 h-4 mr-2" />
-              {t('myReviews.restaurantReviews')} ({restaurantReviews.length})
+              {t("myReviews.restaurantReviews")} ({restaurantReviews.length})
             </TabsTrigger>
-            <TabsTrigger 
+            <TabsTrigger
               value="dish"
               className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
               <UtensilsCrossed className="w-4 h-4 mr-2" />
-              {t('myReviews.dishReviews')} ({dishReviews.length})
+              {t("myReviews.dishReviews")} ({dishReviews.length})
             </TabsTrigger>
           </TabsList>
 
@@ -261,7 +289,7 @@ const MyReviews = () => {
               <div className="text-center py-16 bg-muted/30 rounded-lg">
                 <Store className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
                 <p className="text-lg text-muted-foreground">
-                  {t('myReviews.noRestaurantReviews')}
+                  {t("myReviews.noRestaurantReviews")}
                 </p>
               </div>
             ) : (
@@ -274,7 +302,7 @@ const MyReviews = () => {
               <div className="text-center py-16 bg-muted/30 rounded-lg">
                 <UtensilsCrossed className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
                 <p className="text-lg text-muted-foreground">
-                  {t('myReviews.noDishReviews')}
+                  {t("myReviews.noDishReviews")}
                 </p>
               </div>
             ) : (
@@ -290,4 +318,3 @@ const MyReviews = () => {
 };
 
 export default MyReviews;
-

@@ -27,7 +27,7 @@ import {
 import reviewsData from "@/data/reviews.json";
 import accountsData from "@/data/accounts.json";
 import restaurantsData from "@/data/restaurants.json";
-import dishesData from "@/data/menus.json";
+import dishesDataDefault from "@/data/menus.json";
 import { addDeletedReviewId, getDeletedReviewIds } from "@/utils/reviewStorage";
 
 const ITEMS_PER_PAGE = 10;
@@ -36,6 +36,28 @@ export default function ManageReviews() {
   const { t, language, getLocalizedContent } = useLanguage();
 
   // 1. STATE DỮ LIỆU
+  const [dishesData, setDishesData] = useState<any[]>([]);
+
+  // Load dishes from localStorage or use default data
+  useEffect(() => {
+    const savedDishes = localStorage.getItem("dishes");
+    if (savedDishes) {
+      try {
+        const parsed = JSON.parse(savedDishes);
+        if (Array.isArray(parsed)) {
+          setDishesData(parsed);
+        } else {
+          setDishesData(dishesDataDefault);
+        }
+      } catch (error) {
+        console.error("Error parsing dishes:", error);
+        setDishesData(dishesDataDefault);
+      }
+    } else {
+      setDishesData(dishesDataDefault);
+    }
+  }, []);
+
   const [localReviews, setLocalReviews] = useState(() => {
     // Load reviews từ localStorage (nơi user lưu reviews mới) hoặc JSON
     const savedReviews = localStorage.getItem("reviews");
@@ -96,26 +118,6 @@ export default function ManageReviews() {
     direction: "asc" | "desc";
   }>({ key: "createdAt", direction: "desc" });
 
-  // --- Helper Functions ---
-  const getUserInfo = (userId: number) => {
-    const user = accountsData.find((acc) => acc.id === userId);
-    return {
-      name: user ? user.username : `User #${userId}`,
-      avatar: user ? user.profileImage : null,
-    };
-  };
-
-  const getTargetName = (type: string, targetId: number) => {
-    if (type === "restaurant") {
-      const restaurant = restaurantsData.find((r) => r.id === targetId);
-      return restaurant ? restaurant.name : `Nhà hàng #${targetId}`;
-    } else if (type === "dish") {
-      const dish = dishesData.find((d) => d.id === targetId);
-      return dish ? dish.name : `Món ăn #${targetId}`;
-    }
-    return "Không xác định";
-  };
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString(
       language === "ja" ? "ja-JP" : "vi-VN",
@@ -141,6 +143,26 @@ export default function ManageReviews() {
     });
   };
 
+  // --- Helper Functions (outside useMemo for rendering) ---
+  const getUserInfo = (userId: number) => {
+    const user = accountsData.find((acc) => acc.id === userId);
+    return {
+      name: user ? user.username : `User #${userId}`,
+      avatar: user ? user.profileImage : null,
+    };
+  };
+
+  const getTargetName = (type: string, targetId: number) => {
+    if (type === "restaurant") {
+      const restaurant = restaurantsData.find((r) => r.id === targetId);
+      return restaurant ? restaurant.name : `Nhà hàng #${targetId}`;
+    } else if (type === "dish") {
+      const dish = dishesData.find((d) => d.id === targetId);
+      return dish ? dish.name : `Món ăn #${targetId}`;
+    }
+    return "Không xác định";
+  };
+
   // --- COMPONENT ICON SORT (MỚI) ---
   const SortIcon = ({ columnKey }: { columnKey: string }) => {
     if (sortConfig.key !== columnKey)
@@ -154,6 +176,26 @@ export default function ManageReviews() {
 
   // --- LOGIC LỌC & SẮP XẾP ---
   const filteredData = useMemo(() => {
+    // Helper Functions inside useMemo
+    const getUserInfo = (userId: number) => {
+      const user = accountsData.find((acc) => acc.id === userId);
+      return {
+        name: user ? user.username : `User #${userId}`,
+        avatar: user ? user.profileImage : null,
+      };
+    };
+
+    const getTargetName = (type: string, targetId: number) => {
+      if (type === "restaurant") {
+        const restaurant = restaurantsData.find((r) => r.id === targetId);
+        return restaurant ? restaurant.name : `Nhà hàng #${targetId}`;
+      } else if (type === "dish") {
+        const dish = dishesData.find((d) => d.id === targetId);
+        return dish ? dish.name : `Món ăn #${targetId}`;
+      }
+      return "Không xác định";
+    };
+
     let data = [...localReviews];
 
     // 1. Lọc
@@ -191,7 +233,15 @@ export default function ManageReviews() {
       }
       return 0;
     });
-  }, [localReviews, searchTerm, ratingFilter, language, sortConfig]); // Thêm sortConfig vào dependencies
+  }, [
+    localReviews,
+    searchTerm,
+    ratingFilter,
+    language,
+    sortConfig,
+    dishesData,
+    getLocalizedContent,
+  ]); // Thêm dishesData và getLocalizedContent vào dependencies
 
   // --- TÍNH TOÁN PHÂN TRANG ---
   useEffect(() => {

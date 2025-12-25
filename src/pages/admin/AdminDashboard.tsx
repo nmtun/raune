@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -14,10 +14,31 @@ import { getAllAccounts } from "@/utils/profileUtils";
 import { getAllRestaurants } from "@/utils/restaurantUtils";
 import { filterDeletedReviews } from "@/utils/reviewStorage";
 import reviewsData from "@/data/reviews.json";
-import menusData from "@/data/menus.json";
+import menusDataDefault from "@/data/menus.json";
 
 export default function Dashboard() {
   const { t } = useLanguage();
+  const [menusData, setMenusData] = useState<any[]>([]);
+
+  // Load dishes from localStorage or use default data
+  useEffect(() => {
+    const savedDishes = localStorage.getItem("dishes");
+    if (savedDishes) {
+      try {
+        const parsed = JSON.parse(savedDishes);
+        if (Array.isArray(parsed)) {
+          setMenusData(parsed);
+        } else {
+          setMenusData(menusDataDefault);
+        }
+      } catch (error) {
+        console.error("Error parsing dishes:", error);
+        setMenusData(menusDataDefault);
+      }
+    } else {
+      setMenusData(menusDataDefault);
+    }
+  }, []);
 
   // Tính toán thống kê
   const stats = useMemo(() => {
@@ -145,7 +166,7 @@ export default function Dashboard() {
       recentReviews,
       topRestaurant,
     };
-  }, []);
+  }, [menusData]);
 
   const statCards = [
     {

@@ -1,20 +1,26 @@
-import { useState, useMemo } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
-import { RestaurantCard } from '@/components/RestaurantCard';
-import { LocationMap } from '@/components/LocationMap';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useGeolocation } from '@/hooks/useGeolocation';
-import { calculateDistance, formatDistance } from '@/utils/distance';
-import { flexibleMatch } from '@/utils/stringUtils';
-import restaurantsData from '@/data/restaurants.json';
-import menusData from '@/data/menus.json';
-import { ArrowLeft, SlidersHorizontal, Map } from 'lucide-react';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+import { RestaurantCard } from "@/components/RestaurantCard";
+import { LocationMap } from "@/components/LocationMap";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useGeolocation } from "@/hooks/useGeolocation";
+import { calculateDistance, formatDistance } from "@/utils/distance";
+import { flexibleMatch } from "@/utils/stringUtils";
+import restaurantsData from "@/data/restaurants.json";
+import menusDataDefault from "@/data/menus.json";
+import { ArrowLeft, SlidersHorizontal, Map } from "lucide-react";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const Search = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -22,21 +28,69 @@ const Search = () => {
   const location = useGeolocation();
   const { t } = useLanguage();
 
-  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
-  const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'rating');
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
+  const [sortBy, setSortBy] = useState(searchParams.get("sort") || "rating");
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
-    searchParams.get('category')?.split(',').filter(Boolean) || []
+    searchParams.get("category")?.split(",").filter(Boolean) || []
   );
   const [priceRanges, setPriceRanges] = useState<string[]>(
-    searchParams.get('price')?.split(',').filter(Boolean) || []
+    searchParams.get("price")?.split(",").filter(Boolean) || []
   );
   const [maxDistance, setMaxDistance] = useState<number>(
-    Number(searchParams.get('distance')) || 10
+    Number(searchParams.get("distance")) || 10
   );
   const [showFilters, setShowFilters] = useState(false);
   const [showMap, setShowMap] = useState(false);
+  const [menusData, setMenusData] = useState<any[]>([]);
 
-  const categories = ['All', 'Vietnamese', 'Asian', 'Western', 'Cafe', 'Fast Food'];
+  const categories = [
+    "All",
+    "Vietnamese",
+    "Asian",
+    "Western",
+    "Cafe",
+    "Fast Food",
+  ];
+
+  // Load dishes from localStorage or use default data
+  useEffect(() => {
+    const loadDishes = () => {
+      const savedDishes = localStorage.getItem("dishes");
+      if (savedDishes) {
+        try {
+          const parsed = JSON.parse(savedDishes);
+          if (Array.isArray(parsed)) {
+            setMenusData(parsed);
+          } else {
+            setMenusData(menusDataDefault);
+          }
+        } catch (error) {
+          console.error("Error parsing dishes:", error);
+          setMenusData(menusDataDefault);
+        }
+      } else {
+        setMenusData(menusDataDefault);
+      }
+    };
+
+    // Initial load
+    loadDishes();
+
+    // Listen for storage events
+    const handleStorageChange = () => {
+      loadDishes();
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    // Check every 1 second for updates
+    const interval = setInterval(loadDishes, 1000);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
 
   const handleRefreshLocation = () => {
     location.refreshLocation();
@@ -59,11 +113,12 @@ const Search = () => {
         const dishMatch = menusData.some((d) => {
           if (d.restaurantId !== r.id) return false;
 
-          const dishNameMatch = typeof d.name === 'string'
-            ? flexibleMatch(d.name, searchQuery)
-            : (flexibleMatch(d.name.vi, searchQuery) ||
-               flexibleMatch(d.name.ja, searchQuery) ||
-               d.name.ja.includes(searchQuery));
+          const dishNameMatch =
+            typeof d.name === "string"
+              ? flexibleMatch(d.name, searchQuery)
+              : flexibleMatch(d.name.vi, searchQuery) ||
+                flexibleMatch(d.name.ja, searchQuery) ||
+                d.name.ja.includes(searchQuery);
 
           return dishNameMatch || flexibleMatch(d.category, searchQuery);
         });
@@ -73,13 +128,18 @@ const Search = () => {
     }
 
     // Apply category filter
-    if (selectedCategories.length > 0 && !selectedCategories.includes('All')) {
+    if (selectedCategories.length > 0 && !selectedCategories.includes("All")) {
       results = results.filter((r) => selectedCategories.includes(r.category));
     }
 
     // Calculate distances and attach featured dishes
     const withDistance = results.map((r) => {
-      const distance = calculateDistance(location.lat, location.lng, r.lat, r.lng);
+      const distance = calculateDistance(
+        location.lat,
+        location.lng,
+        r.lat,
+        r.lng
+      );
 
       // Get dishes for this restaurant
       let dishes = menusData.filter((d) => d.restaurantId === r.id);
@@ -88,16 +148,20 @@ const Search = () => {
       if (searchQuery) {
         const matchingDishes = dishes.filter((d) => {
           // Kiểm tra tên món ăn (hỗ trợ cả tiếng Việt và tiếng Nhật)
-          const dishNameMatch = typeof d.name === 'string'
-            ? flexibleMatch(d.name, searchQuery)
-            : (flexibleMatch(d.name.vi, searchQuery) ||
-               flexibleMatch(d.name.ja, searchQuery) ||
-               d.name.ja.includes(searchQuery)); // Thêm tìm kiếm trực tiếp cho tiếng Nhật
+          const dishNameMatch =
+            typeof d.name === "string"
+              ? flexibleMatch(d.name, searchQuery)
+              : flexibleMatch(d.name.vi, searchQuery) ||
+                flexibleMatch(d.name.ja, searchQuery) ||
+                d.name.ja.includes(searchQuery); // Thêm tìm kiếm trực tiếp cho tiếng Nhật
 
           return dishNameMatch || flexibleMatch(d.category, searchQuery);
         });
         // If there are matching dishes, show them; otherwise show top 3 dishes
-        dishes = matchingDishes.length > 0 ? matchingDishes.slice(0, 3) : dishes.slice(0, 3);
+        dishes =
+          matchingDishes.length > 0
+            ? matchingDishes.slice(0, 3)
+            : dishes.slice(0, 3);
       } else {
         // Show top 3 highest rated dishes
         dishes = dishes.sort((a, b) => b.rating - a.rating).slice(0, 3);
@@ -111,35 +175,45 @@ const Search = () => {
     });
 
     // Apply distance filter
-    const filteredByDistance = withDistance.filter((r) => r.distance <= maxDistance);
+    const filteredByDistance = withDistance.filter(
+      (r) => r.distance <= maxDistance
+    );
 
     // Apply sorting
     switch (sortBy) {
-      case 'rating':
+      case "rating":
         filteredByDistance.sort((a, b) => b.rating - a.rating);
         break;
-      case 'distance':
+      case "distance":
         filteredByDistance.sort((a, b) => a.distance - b.distance);
         break;
-      case 'reviews':
+      case "reviews":
         filteredByDistance.sort((a, b) => b.reviews - a.reviews);
         break;
     }
 
     return filteredByDistance;
-  }, [searchQuery, selectedCategories, sortBy, maxDistance, location.lat, location.lng]);
+  }, [
+    searchQuery,
+    selectedCategories,
+    sortBy,
+    maxDistance,
+    location.lat,
+    location.lng,
+  ]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams();
-    if (searchQuery) params.set('q', searchQuery);
-    if (sortBy !== 'rating') params.set('sort', sortBy);
-    if (selectedCategories.length > 0) params.set('category', selectedCategories.join(','));
+    if (searchQuery) params.set("q", searchQuery);
+    if (sortBy !== "rating") params.set("sort", sortBy);
+    if (selectedCategories.length > 0)
+      params.set("category", selectedCategories.join(","));
     setSearchParams(params);
   };
 
   const toggleCategory = (category: string) => {
-    if (category === 'All') {
+    if (category === "All") {
       setSelectedCategories([]);
     } else {
       setSelectedCategories((prev) =>
@@ -153,7 +227,11 @@ const Search = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header
-        location={location.isFallback ? t('location.defaultLocation') : t('location.yourLocation')}
+        location={
+          location.isFallback
+            ? t("location.defaultLocation")
+            : t("location.yourLocation")
+        }
         onRefreshLocation={handleRefreshLocation}
         isLoadingLocation={location.loading}
         isFallbackLocation={location.isFallback}
@@ -162,19 +240,13 @@ const Search = () => {
       <div className="container mx-auto px-4 py-6 flex-1">
         {/* Back Button & Map Toggle */}
         <div className="flex items-center justify-between mb-4">
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/')}
-          >
+          <Button variant="ghost" onClick={() => navigate("/")}>
             <ArrowLeft className="w-4 h-4 mr-2" />
-            {t('search.backHome')}
+            {t("search.backHome")}
           </Button>
-          <Button
-            variant="outline"
-            onClick={() => setShowMap(!showMap)}
-          >
+          <Button variant="outline" onClick={() => setShowMap(!showMap)}>
             <Map className="w-4 h-4 mr-2" />
-            {showMap ? t('search.hideMap') : t('search.showMap')}
+            {showMap ? t("search.hideMap") : t("search.showMap")}
           </Button>
         </div>
 
@@ -185,12 +257,12 @@ const Search = () => {
             <div className="flex gap-2">
               <Input
                 type="text"
-                placeholder={t('search.searchPlaceholder')}
+                placeholder={t("search.searchPlaceholder")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="flex-1"
               />
-              <Button type="submit">{t('search.searchButton')}</Button>
+              <Button type="submit">{t("search.searchButton")}</Button>
               <Button
                 type="button"
                 variant="outline"
@@ -202,36 +274,59 @@ const Search = () => {
             </div>
 
             {/* Filters */}
-            <div className={`space-y-4 ${showFilters ? 'block' : 'hidden md:block'}`}>
+            <div
+              className={`space-y-4 ${
+                showFilters ? "block" : "hidden md:block"
+              }`}
+            >
               {/* Sort and Distance */}
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1">
-                  <Label className="text-sm font-medium mb-2 block">{t('search.sortBy')}</Label>
+                  <Label className="text-sm font-medium mb-2 block">
+                    {t("search.sortBy")}
+                  </Label>
                   <Select value={sortBy} onValueChange={setSortBy}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="rating">{t('sort.rating')}</SelectItem>
-                      <SelectItem value="distance">{t('sort.distance')}</SelectItem>
-                      <SelectItem value="reviews">{t('sort.reviews')}</SelectItem>
+                      <SelectItem value="rating">{t("sort.rating")}</SelectItem>
+                      <SelectItem value="distance">
+                        {t("sort.distance")}
+                      </SelectItem>
+                      <SelectItem value="reviews">
+                        {t("sort.reviews")}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="flex-1">
                   <Label className="text-sm font-medium mb-2 block">
-                    {t('search.searchRadius', { radius: maxDistance })}
+                    {t("search.searchRadius", { radius: maxDistance })}
                   </Label>
-                  <Select value={maxDistance.toString()} onValueChange={(v) => setMaxDistance(Number(v))}>
+                  <Select
+                    value={maxDistance.toString()}
+                    onValueChange={(v) => setMaxDistance(Number(v))}
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="3">{t('distance.within3km')}</SelectItem>
-                      <SelectItem value="5">{t('distance.within5km')}</SelectItem>
-                      <SelectItem value="10">{t('distance.within10km')}</SelectItem>
-                      <SelectItem value="20">{t('distance.within20km')}</SelectItem>
-                      <SelectItem value="50">{t('distance.within50km')}</SelectItem>
+                      <SelectItem value="3">
+                        {t("distance.within3km")}
+                      </SelectItem>
+                      <SelectItem value="5">
+                        {t("distance.within5km")}
+                      </SelectItem>
+                      <SelectItem value="10">
+                        {t("distance.within10km")}
+                      </SelectItem>
+                      <SelectItem value="20">
+                        {t("distance.within20km")}
+                      </SelectItem>
+                      <SelectItem value="50">
+                        {t("distance.within50km")}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -239,23 +334,32 @@ const Search = () => {
 
               {/* Categories */}
               <div>
-                <Label className="text-sm font-medium mb-2 block">{t('search.category')}</Label>
+                <Label className="text-sm font-medium mb-2 block">
+                  {t("search.category")}
+                </Label>
                 <div className="flex flex-wrap gap-2">
                   {categories.map((category) => {
                     const isSelected =
-                      category === 'All'
+                      category === "All"
                         ? selectedCategories.length === 0
                         : selectedCategories.includes(category);
 
                     const getCategoryName = (cat: string) => {
-                      switch(cat) {
-                        case 'All': return t('categories.all');
-                        case 'Vietnamese': return t('categories.vietnamese');
-                        case 'Asian': return t('categories.asian');
-                        case 'Western': return t('categories.western');
-                        case 'Cafe': return t('categories.cafe');
-                        case 'Fast Food': return t('categories.fast food');
-                        default: return cat;
+                      switch (cat) {
+                        case "All":
+                          return t("categories.all");
+                        case "Vietnamese":
+                          return t("categories.vietnamese");
+                        case "Asian":
+                          return t("categories.asian");
+                        case "Western":
+                          return t("categories.western");
+                        case "Cafe":
+                          return t("categories.cafe");
+                        case "Fast Food":
+                          return t("categories.fast food");
+                        default:
+                          return cat;
                       }
                     };
 
@@ -266,8 +370,8 @@ const Search = () => {
                         onClick={() => toggleCategory(category)}
                         className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
                           isSelected
-                            ? 'bg-primary text-primary-foreground border-primary'
-                            : 'bg-background text-foreground border-border hover:border-primary'
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-background text-foreground border-border hover:border-primary"
                         }`}
                       >
                         {getCategoryName(category)}
@@ -303,22 +407,22 @@ const Search = () => {
         <div className="mb-4">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-foreground">
-              {t('search.restaurants', { count: filteredRestaurants.length })}
+              {t("search.restaurants", { count: filteredRestaurants.length })}
             </h2>
             {searchQuery && (
               <p className="text-sm text-muted-foreground">
-                {t('search.searchFor', { query: searchQuery })}
+                {t("search.searchFor", { query: searchQuery })}
               </p>
             )}
           </div>
           {location.isFallback && (
             <p className="text-sm text-yellow-600 mt-1">
-              {t('location.fallbackNote')}
+              {t("location.fallbackNote")}
             </p>
           )}
           {searchQuery && filteredRestaurants.length > 0 && (
             <p className="text-xs text-green-600 mt-1">
-              {t('search.searchTip')}
+              {t("search.searchTip")}
             </p>
           )}
         </div>
@@ -326,16 +430,16 @@ const Search = () => {
         {filteredRestaurants.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground">
-              {t('search.noResults')}{' '}
+              {t("search.noResults")}{" "}
               <button
                 onClick={() => {
-                  setSearchQuery('');
+                  setSearchQuery("");
                   setSelectedCategories([]);
                   setMaxDistance(50);
                 }}
                 className="text-primary hover:underline"
               >
-                {t('search.clearFilters')}
+                {t("search.clearFilters")}
               </button>
             </p>
           </div>
